@@ -1,0 +1,961 @@
+<!doctype html><html lang="da"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Talbanen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+/* Layout: one calm centred column on squared maths paper; the daily-round card and the question card are the only "sticker" objects */
+:root{
+  --paper:#f6f8fc; --grid:#dde5f2; --card:#ffffff; --ink:#1b2440; --muted:#5a6684; --line:#cdd5e5;
+  --pen:#2b55c8; --pen-soft:#e5ecfc; --mark:rgba(255,214,64,.7); --good:#16804c; --good-soft:#ddf3e7;
+  --bad:#bf3b35; --bad-soft:#fbe4e2; --flame:#ea6a22; --shadow:#1b2440; --lock:#b8c1d4;
+  --display:'Bricolage Grotesque','Avenir Next','Segoe UI',system-ui,sans-serif;
+  --body:'Atkinson Hyperlegible','Segoe UI',system-ui,sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#10141f; --grid:#1a2133; --card:#171e2f; --ink:#e8ecf6; --muted:#9ba6c2; --line:#2c3652;
+  --pen:#89a8ff; --pen-soft:#22305a; --mark:rgba(240,196,48,.38); --good:#52cf8f; --good-soft:#15392a;
+  --bad:#ff8077; --bad-soft:#42211f; --flame:#ff9550; --shadow:#04060b; --lock:#3a4460; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#10141f; --grid:#1a2133; --card:#171e2f; --ink:#e8ecf6; --muted:#9ba6c2; --line:#2c3652;
+  --pen:#89a8ff; --pen-soft:#22305a; --mark:rgba(240,196,48,.38); --good:#52cf8f; --good-soft:#15392a;
+  --bad:#ff8077; --bad-soft:#42211f; --flame:#ff9550; --shadow:#04060b; --lock:#3a4460; color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{background-color:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:26px 26px;background-position:-1px -1px}
+#app{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:20px 56px;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--display);line-height:1.15;margin:0;text-wrap:balance}
+h1{font-size:clamp(1.7rem,5vw,2.3rem);font-weight:800;letter-spacing:-.01em}
+h2{font-size:1.25rem;font-weight:800}
+h3{font-size:1.05rem;font-weight:600}
+p{margin:0}
+.muted{color:var(--muted)}
+.eyebrow{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.hl{background:linear-gradient(transparent 52%,var(--mark) 52%);padding-inline:2px}
+.num{font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--pen);outline-offset:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:2px solid var(--ink);background:var(--card);border-radius:999px;padding:10px 20px;font-weight:700;min-height:46px}
+.btn:hover{background:var(--pen-soft)}
+.btn.primary{background:var(--pen);border-color:var(--pen);color:#fff}
+:root[data-theme="dark"] .btn.primary{color:#0d1322}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#0d1322}}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{border-color:transparent;background:transparent;padding-inline:10px}
+.btn.ghost:hover{background:var(--pen-soft)}
+.btn.small{min-height:36px;padding:6px 14px;font-size:.92rem}
+.btn[disabled]{opacity:.45;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.sticker{background:var(--card);border:2px solid var(--ink);border-radius:var(--r);box-shadow:5px 5px 0 var(--shadow)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+section{display:flex;flex-direction:column;gap:12px}
+
+/* header */
+.top{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end}
+.lvl{display:flex;flex-direction:column;gap:6px;min-width:0}
+.lvl .bar{height:12px;border-radius:999px;background:var(--pen-soft);border:1px solid var(--line);overflow:hidden}
+.lvl .bar i{display:block;height:100%;background:var(--pen);border-radius:999px;transition:width .6s ease}
+.streak{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:8px 14px}
+.streak b{font-family:var(--display);font-size:1.9rem;line-height:1}
+.streak small{display:block;color:var(--muted);font-size:.78rem;line-height:1.2}
+.flame{width:30px;height:36px;flex:none}
+.flame path{fill:var(--flame)}
+.flame.off path{fill:var(--lock)}
+.shields{display:flex;gap:3px;margin-top:3px}
+.shield{width:12px;height:14px}
+.shield path{fill:var(--pen)}
+
+/* round card */
+.round{padding:22px;display:grid;gap:14px}
+.round .meta{display:flex;flex-wrap:wrap;gap:8px}
+.tag{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:.88rem;background:var(--paper)}
+.tag.cur{border-color:var(--pen);color:var(--pen);font-weight:700}
+.done-msg{display:flex;gap:12px;align-items:center}
+.check{width:40px;height:40px;border-radius:50%;background:var(--good);display:grid;place-items:center;flex:none}
+.check svg{width:22px;height:22px}
+.check path{stroke:var(--card);stroke-width:3.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+/* week */
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.day{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.8rem;color:var(--muted)}
+.day i{width:30px;height:30px;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center}
+.day.on i{background:var(--flame);border:2px solid var(--flame)}
+.day.today span{color:var(--ink);font-weight:700}
+.day.today i{border-color:var(--ink)}
+.day.on.today i{border-color:var(--ink)}
+
+/* chapter map */
+.map{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.map{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.chap{position:relative;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.chap:hover{border-color:var(--pen)}
+.chap .n{font-family:var(--display);font-weight:800;font-size:1.6rem;line-height:1;color:var(--muted)}
+.chap .t{font-weight:700;line-height:1.25}
+.chap .s{font-size:.8rem;color:var(--muted)}
+.chap.now{border:2px solid var(--pen);background:var(--pen-soft)}
+.chap.now .n{color:var(--pen)}
+.chap.later{opacity:.72}
+.stars{display:inline-flex;gap:2px}
+.stars svg{width:15px;height:15px}
+.stars path{fill:var(--lock)}
+.stars .on path{fill:#f2b81b}
+
+/* badges */
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px}
+.badge{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;font-size:.78rem;line-height:1.2;color:var(--muted)}
+.medal{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:1rem;border:2px dashed var(--lock);color:var(--lock)}
+.badge.got{color:var(--ink)}
+.badge.got .medal{border:3px solid var(--ink);background:var(--mark);color:var(--ink)}
+.foot{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
+
+/* quiz */
+.qtop{display:flex;align-items:center;gap:12px}
+.prog{flex:1;display:flex;gap:4px}
+.prog i{flex:1;height:10px;border-radius:999px;background:var(--line)}
+.prog i.ok{background:var(--good)}
+.prog i.half{background:#e8a23a}
+.prog i.no{background:var(--bad)}
+.prog i.cur{background:var(--pen)}
+.combo{font-family:var(--display);font-weight:800;color:var(--flame);min-width:58px;text-align:right}
+.qcard{padding:22px;display:flex;flex-direction:column;gap:18px}
+.qtext{font-size:1.32rem;line-height:1.45}
+.qtext .big{font-family:var(--display);font-weight:800;font-size:1.5rem;white-space:nowrap}
+.fig{display:block;max-width:100%;height:auto;margin-inline:auto}
+.fig .shape{fill:var(--pen-soft);stroke:var(--ink);stroke-width:2.5;stroke-linejoin:round}
+.fig .ln{stroke:var(--ink);stroke-width:2.5;fill:none;stroke-linecap:round}
+.fig .dash{stroke:var(--pen);stroke-width:2;stroke-dasharray:5 4;fill:none}
+.fig .arc{stroke:var(--pen);stroke-width:2.5;fill:none}
+.fig .gridl{stroke:var(--line);stroke-width:1}
+.fig .axis{stroke:var(--muted);stroke-width:1.6}
+.fig .axis.hot{stroke:var(--flame);stroke-width:3}
+.fig .pt{fill:var(--pen)}
+.fig text{fill:var(--ink);font-family:var(--body);font-size:12px}
+.fig .lbl{font-weight:700;font-size:14px}
+.fig .tick{fill:var(--muted);font-size:9px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips span{border:2px solid var(--ink);border-radius:8px;padding:4px 12px;font-family:var(--display);font-weight:800;font-size:1.2rem;background:var(--paper);font-variant-numeric:tabular-nums}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.05;margin-inline:2px;font-variant-numeric:tabular-nums}
+.fr span:first-child{border-bottom:2px solid currentColor;padding-inline:3px}
+.fr span{padding-inline:2px}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:520px){.choices{grid-template-columns:1fr}}
+.choice{display:flex;align-items:center;gap:12px;text-align:left;border:2px solid var(--line);background:var(--card);border-radius:12px;padding:12px 14px;font-size:1.12rem;min-height:56px}
+.choice:hover:not([disabled]){border-color:var(--pen);background:var(--pen-soft)}
+.choice .k{flex:none;width:28px;height:28px;border-radius:8px;border:1.5px solid var(--line);display:grid;place-items:center;font-size:.8rem;font-weight:700;color:var(--muted)}
+.choice.picked-wrong{border-color:var(--bad);background:var(--bad-soft);text-decoration:line-through;opacity:.8}
+.choice.right{border-color:var(--good);background:var(--good-soft)}
+.choice[disabled]{cursor:default}
+.ans{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.inwrap{display:flex;align-items:center;border:2px solid var(--ink);border-radius:12px;background:var(--card);padding-inline:14px;min-height:56px;flex:1 1 200px;max-width:340px}
+.inwrap input{border:0;background:transparent;font:inherit;font-size:1.35rem;font-family:var(--display);font-weight:800;width:100%;min-width:0;color:var(--ink);padding:8px 0;outline:none}
+.inwrap .unit{color:var(--muted);font-weight:700;padding-left:8px;white-space:nowrap}
+.inwrap.bad{border-color:var(--bad);background:var(--bad-soft)}
+.inwrap.good{border-color:var(--good);background:var(--good-soft)}
+.hintbox{border-left:4px solid var(--pen);background:var(--pen-soft);padding:10px 14px;border-radius:0 10px 10px 0}
+.fb{border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.fb.good{background:var(--good-soft);border:1px solid var(--good)}
+.fb.bad{background:var(--bad-soft);border:1px solid var(--bad)}
+.fb.try{background:var(--paper);border:1px dashed var(--bad)}
+.fb strong{font-family:var(--display);font-size:1.15rem}
+.fb .book{font-size:.85rem;color:var(--muted)}
+.xpfloat{font-family:var(--display);font-weight:800;color:var(--good)}
+.qactions{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
+
+/* done */
+.result{padding:24px;display:flex;flex-direction:column;gap:16px;align-items:flex-start}
+.bignum{font-family:var(--display);font-weight:800;font-size:3.2rem;line-height:1}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%}
+.stat{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--paper)}
+.stat b{display:block;font-family:var(--display);font-size:1.5rem;font-variant-numeric:tabular-nums}
+.stat span{font-size:.82rem;color:var(--muted)}
+.newbadges{display:flex;flex-wrap:wrap;gap:14px}
+.burst{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:5}
+.burst i{position:absolute;top:-20px;width:10px;height:14px;border-radius:2px;animation:fall 1.8s ease-in forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+@media (prefers-reduced-motion:reduce){.burst{display:none}.lvl .bar i{transition:none}}
+
+/* parent */
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 14px;font-weight:700;min-height:38px}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;max-width:360px}
+.cal i{aspect-ratio:1;border-radius:6px;background:var(--paper);border:1px solid var(--line);max-width:100%}
+.cal i.on{background:var(--flame);border-color:var(--flame)}
+.cal i.part{background:var(--mark)}
+.cal i.today{outline:2px solid var(--ink)}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.n{font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:.8rem;font-weight:700;white-space:nowrap}
+.pill.ok{background:var(--good-soft);color:var(--good)}
+.pill.mid{background:var(--pen-soft);color:var(--pen)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.none{background:var(--paper);color:var(--muted);border:1px solid var(--line)}
+.talk{display:grid;gap:12px}
+.talk .item{border-left:4px solid var(--pen);padding:4px 0 4px 14px;display:flex;flex-direction:column;gap:6px}
+.talk .item.warn{border-color:var(--flame)}
+.together{border:1px dashed var(--line);border-radius:12px;padding:12px;background:var(--paper);display:flex;flex-direction:column;gap:8px}
+.log{display:flex;flex-direction:column;gap:8px}
+.log div{border-bottom:1px solid var(--line);padding-bottom:8px;font-size:.93rem}
+textarea{width:100%;min-height:120px;font-family:ui-monospace,Menlo,monospace;font-size:.8rem;border:2px solid var(--ink);border-radius:12px;padding:10px;background:var(--card);color:var(--ink);word-break:break-all}
+select{font:inherit;border:2px solid var(--ink);border-radius:10px;padding:8px 10px;background:var(--card);color:var(--ink);max-width:100%}
+.banner{border:2px solid var(--pen);background:var(--pen-soft);border-radius:12px;padding:10px 14px}
+.goal{font-size:.85rem;color:var(--muted);font-style:italic}
+.kv{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.kv{grid-template-columns:repeat(2,minmax(0,1fr))}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;font-weight:700;z-index:9}
+</style>
+
+<div id="app" aria-live="polite"></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+(() => {
+'use strict';
+const app = document.getElementById('app');
+
+/* ---------- small helpers ---------- */
+const R = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const shuf = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const gcd = (a, b) => b ? gcd(b, a % b) : Math.abs(a);
+const nf = (x, d = 3) => { const r = Math.round(x * 10 ** d) / 10 ** d; return r.toLocaleString('da-DK', { maximumFractionDigits: d }).replace('-', '−'); };
+const sg = n => n < 0 ? '−' + (-n) : String(n);
+const par = n => n < 0 ? '(' + sg(n) + ')' : String(n);
+const fr = (a, b) => `<span class="fr"><span>${a}</span><span>${b}</span></span>`;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const strip = h => String(h).replace(/<span class="fr"><span>([^<]*)<\/span><span>([^<]*)<\/span><\/span>/g, '$1/$2').replace(/<svg[\s\S]*?<\/svg>/g, '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+const PI = 3.14;
+
+function mc(text, answer, wrongs, o = {}) {
+  const opts = [answer];
+  for (const w of wrongs) if (!opts.includes(w) && opts.length < 4) opts.push(w);
+  return Object.assign({ type: 'mc', text, answer, choices: shuf(opts) }, o);
+}
+function num(text, answer, o = {}) { return Object.assign({ type: 'num', text, answer, tol: 1e-6 }, o); }
+
+/* ---------- small drawings ---------- */
+function angleSVG(v) {
+  const cx = 90, cy = 92, L = 74, rad = v * Math.PI / 180;
+  const x2 = cx + L * Math.cos(rad), y2 = cy - L * Math.sin(rad);
+  let mark;
+  if (v === 90) mark = `<path class="arc" d="M${cx + 16} ${cy} L${cx + 16} ${cy - 16} L${cx} ${cy - 16}"/>`;
+  else { const r = 20, ax = cx + r * Math.cos(rad), ay = cy - r * Math.sin(rad); mark = `<path class="arc" d="M${cx + r} ${cy} A${r} ${r} 0 0 0 ${ax.toFixed(1)} ${ay.toFixed(1)}"/>`; }
+  return `<svg class="fig" viewBox="0 0 180 104" width="220"><path class="ln" d="M${cx} ${cy} L${cx + L} ${cy}"/><path class="ln" d="M${cx} ${cy} L${x2.toFixed(1)} ${y2.toFixed(1)}"/>${mark}<circle class="pt" cx="${cx}" cy="${cy}" r="3.5"/></svg>`;
+}
+function polySVG(pts, w = 150) {
+  return `<svg class="fig" viewBox="0 0 120 120" width="${w}"><polygon class="shape" points="${pts.map(p => p.map(n => n.toFixed(1)).join(',')).join(' ')}"/></svg>`;
+}
+function regPts(n, r = 48) { const a = []; for (let i = 0; i < n; i++) { const t = -Math.PI / 2 + i * 2 * Math.PI / n; a.push([60 + r * Math.cos(t), 62 + r * Math.sin(t)]); } return a; }
+function areaSVG(kind, a, b) {
+  let body = '';
+  if (kind === 'rect') body = `<rect class="shape" x="30" y="20" width="140" height="80"/><text class="lbl" x="100" y="118" text-anchor="middle">${a} cm</text><text class="lbl" x="178" y="64">${b} cm</text>`;
+  if (kind === 'tri') body = `<polygon class="shape" points="25,100 175,100 120,18"/><path class="dash" d="M120 18 L120 100"/><text class="lbl" x="100" y="120" text-anchor="middle">g = ${a} cm</text><text class="lbl" x="126" y="66">h = ${b} cm</text>`;
+  if (kind === 'para') body = `<polygon class="shape" points="25,100 145,100 180,25 60,25"/><path class="dash" d="M60 25 L60 100"/><text class="lbl" x="85" y="120" text-anchor="middle">g = ${a} cm</text><text class="lbl" x="66" y="68">h = ${b} cm</text>`;
+  return `<svg class="fig" viewBox="0 0 230 126" width="300">${body}</svg>`;
+}
+function coordSVG(points, hot) {
+  const S = 13, O = 130, M = 9; let g = '';
+  for (let i = -M; i <= M; i++) { const p = O + i * S; g += `<path class="gridl" d="M${p} ${O - M * S} L${p} ${O + M * S}"/><path class="gridl" d="M${O - M * S} ${p} L${O + M * S} ${p}"/>`; }
+  g += `<path class="axis ${hot === 'x' ? 'hot' : ''}" d="M${O - M * S} ${O} L${O + M * S} ${O}"/><path class="axis ${hot === 'y' ? 'hot' : ''}" d="M${O} ${O - M * S} L${O} ${O + M * S}"/>`;
+  for (let i = -8; i <= 8; i += 2) if (i) { g += `<text class="tick" x="${O + i * S}" y="${O + 11}" text-anchor="middle">${sg(i)}</text><text class="tick" x="${O - 4}" y="${O - i * S + 3}" text-anchor="end">${sg(i)}</text>`; }
+  g += `<text class="lbl" x="${O + M * S - 4}" y="${O - 6}" text-anchor="end">x</text><text class="lbl" x="${O + 6}" y="${O - M * S + 12}">y</text>`;
+  for (const p of points) g += `<circle class="pt" cx="${O + p.x * S}" cy="${O - p.y * S}" r="5"/><text class="lbl" x="${O + p.x * S + 7}" y="${O - p.y * S - 7}">${p.l}</text>`;
+  return `<svg class="fig" viewBox="0 0 260 260" width="260">${g}</svg>`;
+}
+const COLS = { 'rød': '#e05a47', 'blå': '#3d6fd8', 'gul': '#f2c230', 'grøn': '#3aa66b', 'hvid': '#ffffff' };
+function patternSVG(seq, reps) {
+  let g = '', x = 4; const all = []; for (let r = 0; r < reps; r++) all.push(...seq);
+  all.forEach((c, i) => { g += `<rect x="${x}" y="6" width="22" height="34" rx="3" fill="${COLS[c]}" stroke="#1b2440" stroke-width="1.5"/><text class="tick" x="${x + 11}" y="54" text-anchor="middle">${i + 1}</text>`; x += 26; });
+  g += `<text class="lbl" x="${x + 4}" y="30">…</text>`;
+  return `<svg class="fig" viewBox="0 0 ${x + 26} 60" width="${Math.min(520, (x + 26) * 1.3)}">${g}</svg>`;
+}
+const chips = vals => `<div class="chips">${vals.map(v => `<span>${v}</span>`).join('')}</div>`;
+
+/* ---------- the year plan: Kontext+ 6, 8 chapters ---------- */
+const CH = [
+ { n: 1, name: 'Tal på tal', area: 'Tal · regnestrategier', viden: '20–23',
+   goal: 'Udvikle metoder til beregninger med decimaltal, enkle brøker og negative hele tal; enkle potenser.',
+   skills: [
+   { id: '1a', name: 'Decimaltal og pladser', gen() {
+     if (Math.random() < .5) {
+       const d = [R(1, 9), R(1, 9), R(0, 9), R(1, 9)];
+       const [pn, pi] = pick([['tiendedelspladsen', 1], ['hundrededelspladsen', 2], ['tusindedelspladsen', 3]]);
+       const s = `${d[0]},${d[1]}${d[2]}${d[3]}`;
+       return num(`Hvilket ciffer står på <b>${pn}</b> i tallet <span class="big">${s}</span>?`, d[pi], { hint: 'Lige efter kommaet kommer tiendedele, så hundrededele, så tusindedele.', explain: `I ${s} er tiendedele = ${d[1]}, hundrededele = ${d[2]} og tusindedele = ${d[3]}. Svaret er ${d[pi]}.` });
+     }
+     const x = R(101, 9999) / 100, f = pick([10, 100, 1000]), op = pick(['·', ':']), z = String(f).length - 1;
+     const ans = op === '·' ? x * f : x / f;
+     return num(`Udregn <span class="big">${nf(x)} ${op} ${nf(f, 0)}</span>`, ans, { hint: op === '·' ? `Ganger man med ${nf(f, 0)}, flytter kommaet ${z} plads${z > 1 ? 'er' : ''} til højre.` : `Dividerer man med ${nf(f, 0)}, flytter kommaet ${z} plads${z > 1 ? 'er' : ''} til venstre.`, explain: `${nf(x)} ${op} ${nf(f, 0)} = ${nf(ans, 5)}. Kommaet flytter ${z} plads${z > 1 ? 'er' : ''} til ${op === '·' ? 'højre' : 'venstre'}.` });
+   } },
+   { id: '1b', name: 'Sammenlign decimaltal', gen() {
+     const a = R(2, 8), o = [`0,${a}`, `0,${a - 1}${R(5, 9)}`, `0,${a - 1}${R(5, 9)}${R(1, 9)}`, `0,0${a}`];
+     if (Math.random() < .55) return mc('Hvilket tal er <b>størst</b>?', o[0], o.slice(1), { hint: 'Sammenlign tiendedelene først. Antallet af cifre er ligegyldigt.', explain: `0,${a} er det samme som 0,${a}00. Det har ${a} tiendedele, og det har ingen af de andre. Derfor er det størst, selvom det har færrest cifre.` });
+     return mc('Hvilket tal er <b>mindst</b>?', o[3], o.slice(0, 3), { hint: 'Se på tiendedelspladsen. Et 0 der betyder 0 tiendedele.', explain: `0,0${a} har 0 tiendedele, så det er mindst.` });
+   } },
+   { id: '1c', name: 'Forkort og omregn brøker', gen() {
+     if (Math.random() < .5) {
+       const [a, b] = pick([[1, 2], [1, 3], [2, 3], [1, 4], [3, 4], [2, 5], [3, 5], [4, 5], [5, 6], [3, 8], [5, 8], [2, 7]]), k = R(2, 6);
+       return mc(`Forkort ${fr(a * k, b * k)} mest muligt.`, fr(a, b), [fr(b, a), fr(a + 1, b + 1), fr(a, b * k), fr(a * k - 1, b * k - 1)], { hint: 'Find det største tal, som både tæller og nævner kan deles med.', explain: `Både ${a * k} og ${b * k} kan deles med ${k}: ${a * k} : ${k} = ${a} og ${b * k} : ${k} = ${b}.` });
+     }
+     const [a, b] = pick([[1, 2], [1, 4], [3, 4], [1, 5], [2, 5], [3, 5], [4, 5], [7, 10], [3, 10], [1, 8], [3, 8], [1, 20], [9, 20]]);
+     return num(`Skriv ${fr(a, b)} som decimaltal.`, a / b, { hint: 'Udvid brøken, så nævneren bliver 10, 100 eller 1000. Eller del tælleren med nævneren.', explain: `${a} : ${b} = ${nf(a / b)}.` });
+   } },
+   { id: '1d', name: 'Regn med brøker', gen() {
+     const t = R(0, 2);
+     if (t === 0) {
+       const b = pick([5, 7, 8, 9, 11]), a1 = R(1, b - 2), a2 = R(1, b - 1 - a1), s = a1 + a2, g = gcd(s, b);
+       return mc(`Udregn ${fr(a1, b)} + ${fr(a2, b)}`, fr(s, b), [fr(s, 2 * b), fr(s + 1, b), fr(a1 * a2, b), fr(s, b + 1)], { hint: 'Når nævnerne er ens, lægger man kun tællerne sammen.', explain: `Nævneren bliver ved med at være ${b}. Tællerne lægges sammen: ${a1} + ${a2} = ${s}. Svaret er ${s}/${b}${g > 1 ? ` (forkortet: ${s / g}/${b / g})` : ''}.` });
+     }
+     if (t === 1) {
+       const b = pick([2, 3, 4, 5]), a = R(1, b - 1), c = pick([1, 3, 5, 7].filter(x => x < 2 * b));
+       return mc(`Udregn ${fr(a, b)} + ${fr(c, 2 * b)}`, fr(2 * a + c, 2 * b), [fr(a + c, 3 * b), fr(a + c, 2 * b), fr(2 * a + c + 1, 2 * b)], { hint: `Gør nævnerne ens først. Udvid ${a}/${b} med 2.`, explain: `${a}/${b} = ${2 * a}/${2 * b}. Så ${2 * a}/${2 * b} + ${c}/${2 * b} = ${2 * a + c}/${2 * b}.` });
+     }
+     const b = pick([2, 3, 4, 5, 6, 8]), a = R(1, b - 1), n = b * R(2, 12), ans = n / b * a;
+     return num(`Noahs gartneri har <b>${n}</b> planter. ${fr(a, b)} af dem er tomatplanter. Hvor mange tomatplanter er der?`, ans, { unit: 'planter', hint: `Find først ${fr(1, b)} ved at dele med ${b}.`, explain: `${n} : ${b} = ${n / b}. Det er 1/${b}. ${a} af dem er ${n / b} · ${a} = ${ans}.` });
+   } },
+   { id: '1e', name: 'Negative tal', gen() {
+     const t = R(0, 2);
+     if (t === 0) { const lo = -R(2, 12), hi = R(1, 15); return num(`Om morgenen er der <b>${sg(lo)} °C</b>. Om eftermiddagen er der <b>${hi} °C</b>. Hvor mange grader er temperaturen steget?`, hi - lo, { unit: 'grader', hint: 'Tæl først op til 0 og læg så resten til.', explain: `Fra ${sg(lo)} op til 0 er ${-lo} grader. Fra 0 op til ${hi} er ${hi} grader. I alt ${-lo} + ${hi} = ${hi - lo} grader.` }); }
+     if (t === 1) { const a = R(-10, 10), b = R(2, 12), op = pick(['+', '−']), ans = op === '+' ? a + b : a - b; return num(`Udregn <span class="big">${sg(a)} ${op} ${b}</span>`, ans, { hint: `Tænk på en tallinje. Start ved ${sg(a)} og gå ${b} til ${op === '+' ? 'højre' : 'venstre'}.`, explain: `Start ved ${sg(a)} og gå ${b} skridt til ${op === '+' ? 'højre' : 'venstre'} på tallinjen. Du lander på ${sg(ans)}.` }); }
+     const s = -R(1, 4), up = R(2, 7), ans = s + up;
+     return num(`Parkeringshuset: Elevatoren starter på etage <b>${sg(s)}</b> og kører <b>${up}</b> etager op. Hvilken etage kommer den til?`, ans, { hint: 'Etage 0 er stueetagen. Under jorden er etagerne negative.', explain: `${sg(s)} + ${up} = ${sg(ans)}.` });
+   } },
+   { id: '1f', name: 'Potenser og kvadratrødder', gen() {
+     const t = R(0, 3);
+     if (t === 0) { const a = R(2, 12); return num(`Udregn <span class="big">${a}²</span>`, a * a, { hint: `${a}² betyder ${a} · ${a}.`, explain: `${a}² = ${a} · ${a} = ${a * a}.` }); }
+     if (t === 1) { const a = R(2, 12); return num(`Udregn <span class="big">√${a * a}</span>`, a, { hint: `Hvilket tal gange sig selv giver ${a * a}?`, explain: `${a} · ${a} = ${a * a}, så √${a * a} = ${a}.` }); }
+     if (t === 2) { const [b, e] = pick([[2, 3], [2, 4], [2, 5], [2, 6], [3, 3], [3, 4], [10, 2], [10, 3], [10, 4], [5, 3]]); return num(`Udregn <span class="big">${b}<sup>${e}</sup></span>`, b ** e, { hint: `Gang ${b} med sig selv – ${e} ${b} i alt.`, explain: `${Array(e).fill(b).join(' · ')} = ${nf(b ** e, 0)}.` }); }
+     let n; do { n = R(10, 140); } while (Number.isInteger(Math.sqrt(n)));
+     const k = Math.floor(Math.sqrt(n));
+     return mc(`De skæve kvadratrødder: Mellem hvilke to hele tal ligger <span class="big">√${n}</span>?`, `${k} og ${k + 1}`, [`${k - 1} og ${k}`, `${k + 1} og ${k + 2}`, `${Math.floor(n / 2)} og ${Math.floor(n / 2) + 1}`], { hint: 'Find de to kvadrattal, som tallet ligger imellem.', explain: `${k}² = ${k * k} og ${k + 1}² = ${(k + 1) ** 2}. ${n} ligger mellem dem, så √${n} ligger mellem ${k} og ${k + 1}.` });
+   } },
+   ] },
+ { n: 2, name: 'Cirkler', area: 'Måling', viden: '42–43',
+   goal: 'Bestemme omkreds og areal af cirkler.',
+   skills: [
+   { id: '2a', name: 'Radius og diameter', gen() {
+     if (Math.random() < .35) {
+       const q = pick([['Hvad hedder linjen fra cirklens centrum ud til kanten?', 'radius'], ['Hvad hedder linjen, der går tværs over cirklen gennem centrum?', 'diameter'], ['Hvad hedder længden hele vejen rundt om cirklen?', 'omkreds']]);
+       return mc(q[0], q[1], shuf(['radius', 'diameter', 'omkreds', 'centrum'].filter(x => x !== q[1])), { hint: 'Diameteren er dobbelt så lang som radius.', explain: 'Radius går fra centrum ud til kanten. Diameteren går hele vejen tværs over, gennem centrum. Omkredsen er vejen rundt.' });
+     }
+     if (Math.random() < .5) { const d = 2 * R(2, 25); return num(`En cirkel har en diameter på <b>${d} cm</b>. Hvor lang er radius?`, d / 2, { unit: 'cm', hint: 'Radius er halvdelen af diameteren.', explain: `r = d : 2 = ${d} : 2 = ${d / 2} cm.` }); }
+     const r = R(3, 30); return num(`Telemasten står midt i en cirkel af barduner med radius <b>${r} m</b>. Hvor lang er cirklens diameter?`, 2 * r, { unit: 'm', hint: 'Diameteren er dobbelt så lang som radius.', explain: `d = 2 · r = 2 · ${r} = ${2 * r} m.` });
+   } },
+   { id: '2b', name: 'Cirklens omkreds', gen() {
+     const useR = Math.random() < .45, v = useR ? R(2, 15) : R(4, 30), d = useR ? 2 * v : v, ans = PI * d;
+     const txt = useR ? `Et cykelhjul har en radius på <b>${v} cm</b>. Hvor lang er omkredsen?` : pick([`Rideskolens runde ridebane har en diameter på <b>${v} m</b>. Hvor lang er omkredsen?`, `Et rundt bord har en diameter på <b>${v} dm</b>. Hvor lang er omkredsen?`]);
+     const unit = useR ? 'cm' : (txt.includes('Rideskolens') ? 'm' : 'dm');
+     return num(`${txt} <span class="muted">Brug π = 3,14 og rund til én decimal.</span>`, ans, { tol: .06, unit, hint: useR ? 'Omkreds = π · d. Husk at diameteren er 2 · radius.' : 'Omkreds = π · d', explain: `${useR ? `d = 2 · ${v} = ${d}. ` : ''}O = π · d = 3,14 · ${d} = ${nf(ans, 2)}.` });
+   } },
+   { id: '2c', name: 'Cirklens areal', gen() {
+     const useD = Math.random() < .3, r = R(2, 12), A = PI * r * r;
+     const txt = useD ? `En rund pizza har en diameter på <b>${2 * r} cm</b>. Hvor stort er arealet?` : `En cirkel har radius <b>${r} cm</b>. Hvor stort er arealet?`;
+     return num(`${txt} <span class="muted">Brug π = 3,14 og rund til én decimal.</span>`, A, { tol: .06, unit: 'cm²', hint: useD ? 'Areal = π · r · r. Find radius først: halvdelen af diameteren.' : 'Areal = π · r · r', explain: `${useD ? `r = ${2 * r} : 2 = ${r}. ` : ''}A = π · r² = 3,14 · ${r} · ${r} = ${nf(A, 2)} cm².` });
+   } },
+   { id: '2d', name: 'Formler og π', gen() {
+     const q = pick([
+       ['Hvilken formel giver <b>omkredsen</b> af en cirkel?', 'π · d', ['π · r²', 'r · r', 'd : 2'], 'Omkredsen er π gange diameteren: O = π · d (eller 2 · π · r).'],
+       ['Hvilken formel giver <b>arealet</b> af en cirkel?', 'π · r²', ['π · d', '2 · r', 'π + r'], 'Arealet er π gange radius i anden: A = π · r².'],
+       ['Hvad er π cirka?', '3,14', ['3,41', '2,14', '31,4'], 'π er cirka 3,14. Det er et tal med uendelig mange decimaler.'],
+       ['Hvis diameteren bliver dobbelt så stor, hvad sker der så med omkredsen?', 'Den bliver dobbelt så stor', ['Den bliver 4 gange så stor', 'Den bliver halvt så stor', 'Den ændrer sig ikke'], 'O = π · d. Dobbelt d giver dobbelt O.'],
+       ['Hvis radius bliver dobbelt så stor, hvad sker der så med arealet?', 'Det bliver 4 gange så stort', ['Det bliver dobbelt så stort', 'Det bliver 3 gange så stort', 'Det ændrer sig ikke'], 'A = π · r · r. Når r fordobles, ganges der med 2 to gange: 2 · 2 = 4.'],
+       ['π er forholdet mellem en cirkels …', 'omkreds og diameter', ['areal og radius', 'radius og diameter', 'omkreds og areal'], 'Deler du omkredsen med diameteren, får du altid π, uanset hvor stor cirklen er.']]);
+     return mc(q[0], q[1], q[2], { hint: 'Tænk på, hvad radius, diameter og omkreds betyder.', explain: q[3] });
+   } },
+   { id: '2e', name: 'Vinkler i cirklen', gen() {
+     const t = R(0, 2);
+     if (t === 0) { const n = pick([2, 3, 4, 5, 6, 8, 9, 10, 12]); return num(`En pizza skæres i <b>${n}</b> lige store stykker. Hvor mange grader er vinklen i spidsen af hvert stykke?`, 360 / n, { unit: '°', hint: 'Hele vejen rundt er 360°.', explain: `360° : ${n} = ${360 / n}°.` }); }
+     if (t === 1) { const opts = [[90, fr(1, 4)], [180, fr(1, 2)], [120, fr(1, 3)], [45, fr(1, 8)], [60, fr(1, 6)], [72, fr(1, 5)]]; const [v, f] = pick(opts); return mc(`Et cirkeludsnit har vinklen <b>${v}°</b>. Hvor stor en del af cirklen er det?`, f, shuf(opts.filter(o => o[0] !== v)).map(o => o[1]), { hint: 'Del vinklen med 360°.', explain: `${v}° ud af 360° = ${v}/360 = ${strip(f)}.` }); }
+     const p = pick([10, 20, 25, 30, 40, 50, 75]); return num(`I et cirkeldiagram cykler <b>${p} %</b> af eleverne i skole. Hvor mange grader er det udsnit?`, 3.6 * p, { unit: '°', hint: '100 % er 360°. Så er 1 % lig med 3,6°.', explain: `${p} % af 360° = 360 · ${p} : 100 = ${nf(3.6 * p)}°.` });
+   } },
+   ] },
+ { n: 3, name: 'Tal og handel', area: 'Tal · regnestrategier', viden: '64–67',
+   goal: 'Udføre beregninger med procent, herunder med digitale værktøjer.',
+   skills: [
+   { id: '3a', name: 'Procent af et tal', gen() {
+     if (Math.random() < .3) { const b = pick([20, 25, 40, 50, 200]); let p; do { p = R(1, 19) * 5; } while (!Number.isInteger(b * p / 100)); const a = b * p / 100; return num(`Hvor mange procent er <b>${a}</b> af <b>${b}</b>?`, p, { unit: '%', hint: 'Del delen med det hele og gang med 100.', explain: `${a} : ${b} = ${nf(a / b)} = ${p} %.` }); }
+     const [p, div, how] = pick([[10, 10, 'Del med 10.'], [20, 5, '20 % = 1/5. Del med 5.'], [25, 4, '25 % = 1/4. Del med 4.'], [50, 2, '50 % er det halve.'], [75, 4, '75 % = 3/4. Del med 4 og gang med 3.'], [5, 20, 'Find 10 % og tag det halve.'], [30, 10, 'Find 10 % og gang med 3.'], [40, 5, 'Find 10 % og gang med 4.']]);
+     const n = div * R(2, 40), ans = n * p / 100;
+     return num(`Find <b>${p} %</b> af <b>${n} kr.</b>`, ans, { unit: 'kr.', hint: how, explain: `${how} ${p} % af ${n} = ${ans} kr.` });
+   } },
+   { id: '3b', name: 'Rabat og ny pris', gen() {
+     let price, d; do { price = R(2, 24) * 50; d = pick([10, 20, 25, 30, 40, 50]); } while (!Number.isInteger(price * d / 100));
+     const rab = price * d / 100;
+     if (Math.random() < .25) return num(`I juicebaren stiger prisen på en smoothie fra <b>${price / 10} kr.</b> med <b>10 %</b>. Hvad koster den nu?`, price / 10 * 1.1, { unit: 'kr.', hint: 'Find 10 % og læg det til.', explain: `10 % af ${price / 10} = ${nf(price / 100)}. Ny pris: ${price / 10} + ${nf(price / 100)} = ${nf(price / 10 * 1.1, 2)} kr.` });
+     const item = pick(['en ridehjelm', 'et par ridestøvler', 'en grime', 'et par ridebukser', 'en sadelgjord']);
+     return num(`Udsalg i Horse Shop: <b>${item}</b> koster ${price} kr. Der er <b>${d} % rabat</b>. Hvad koster den nu?`, price - rab, { unit: 'kr.', hint: 'Find først rabatten i kroner. Træk den så fra prisen.', explain: `Rabat: ${d} % af ${price} = ${rab} kr. Ny pris: ${price} − ${rab} = ${price - rab} kr.` });
+   } },
+   { id: '3c', name: 'Brøk, decimal og procent', gen() {
+     const t = R(0, 2);
+     if (t === 0) { const p = R(1, 99); const dd = nf(p / 100, 2); return num(`Skriv <b>${dd}</b> som procent.`, p, { unit: '%', hint: 'Procent betyder hundrededele. Gang med 100.', explain: `${dd} = ${p} hundrededele = ${p} %.` }); }
+     if (t === 1) { const p = pick([7, 3, 45, 80, 5, 12, 60, 2]); return mc(`Hvilket decimaltal er det samme som <b>${p} %</b>?`, nf(p / 100, 2), [nf(p / 10, 2), String(p), nf(p / 1000, 3)], { hint: `${p} % = ${p} hundrededele.`, explain: `${p} % = ${p}/100 = ${nf(p / 100, 2)}.` }); }
+     const [a, b, p] = pick([[1, 2, 50], [1, 4, 25], [3, 4, 75], [1, 5, 20], [2, 5, 40], [3, 5, 60], [1, 10, 10], [9, 10, 90], [3, 20, 15], [7, 25, 28], [1, 20, 5]]);
+     return num(`Skriv ${fr(a, b)} som procent.`, p, { unit: '%', hint: 'Udvid brøken, så nævneren bliver 100.', explain: `${a}/${b} = ${a * 100 / b}/100 = ${p} %.` });
+   } },
+   { id: '3d', name: 'Bedste køb', gen() {
+     const nA = pick([4, 5, 6]), nB = pick([8, 10, 12]), uA = R(5, 12);
+     let uB = uA + pick([-1, 1]) * pick([.5, 1]);
+     const pA = nA * uA, pB = nB * uB;
+     if (Math.random() < .4) return num(`Til skoleboden: En pakke med <b>${nB} juicebrikker</b> koster <b>${nf(pB, 2)} kr.</b> Hvad koster én juicebrik?`, uB, { unit: 'kr.', hint: 'Del prisen med antallet.', explain: `${nf(pB, 2)} : ${nB} = ${nf(uB, 2)} kr. pr. stk.` });
+     const A = `Lille pakke: ${nA} stk. til ${nf(pA, 2)} kr.`, B = `Stor pakke: ${nB} stk. til ${nf(pB, 2)} kr.`;
+     return mc('Til skoleboden skal I købe juicebrikker. Hvilken pakke er <b>billigst pr. stk.</b>?', uA < uB ? A : B, [uA < uB ? B : A, 'De koster det samme pr. stk.'], { hint: 'Find prisen for én juicebrik i hver pakke.', explain: `Lille: ${nf(pA, 2)} : ${nA} = ${nf(uA, 2)} kr. Stor: ${nf(pB, 2)} : ${nB} = ${nf(uB, 2)} kr. Den ${uA < uB ? 'lille' : 'store'} er billigst pr. stk.` });
+   } },
+   { id: '3e', name: 'Klassekassen og overslag', gen() {
+     const t = R(0, 2);
+     if (t === 0) { const s = R(10, 50) * 10, u = s + R(1, 25) * 10; return num(`Klassekassen har <b>${s} kr.</b> I køber ind for <b>${u} kr.</b> Hvad bliver saldoen?`, s - u, { unit: 'kr.', hint: 'Når man bruger mere end man har, bliver saldoen negativ.', explain: `${s} − ${u} = ${sg(s - u)} kr. Kassen skylder ${u - s} kr.` }); }
+     if (t === 1) { const n = R(3, 8), p0 = R(4, 12) * 10, p = p0 + pick([-2, -1, 1, 2]); return mc(`Pizzabrochuren: I bestiller <b>${n} pizzaer</b> til <b>${p} kr.</b> stykket. Hvilket overslag er bedst?`, `ca. ${n * p0} kr.`, [`ca. ${n * p0 + 100} kr.`, `ca. ${(n - 1) * p0} kr.`, `ca. ${n * p0 * 10} kr.`], { hint: `Rund ${p} til nærmeste tier.`, explain: `${p} kr. er tæt på ${p0} kr. ${n} · ${p0} = ${n * p0}. Det præcise svar er ${n * p} kr.` }); }
+     const a = pick([99, 101, 49, 51, 19, 21, 199]), b = R(3, 9), near = Math.round(a / 10) * 10, diff = a - near;
+     return num(`Regn smart: <span class="big">${a} · ${b}</span>`, a * b, { hint: `Regn ${near} · ${b} og ret bagefter.`, explain: `${near} · ${b} = ${near * b}. Så ${diff < 0 ? 'træk' : 'læg'} ${Math.abs(diff)} · ${b} = ${Math.abs(diff) * b} ${diff < 0 ? 'fra' : 'til'}: ${a * b}.` });
+   } },
+   ] },
+ { n: 4, name: 'Kantede figurer', area: 'Geometri · måling · tegning', viden: '88–91',
+   goal: 'Kategorisere polygoner efter sidelængder og vinkler; anslå og bestemme omkreds og areal.',
+   skills: [
+   { id: '4a', name: 'Vinkeltyper', gen() {
+     const ty = pick(['spids', 'ret', 'stump', 'lige']);
+     const v = ty === 'spids' ? R(15, 80) : ty === 'ret' ? 90 : ty === 'stump' ? R(100, 165) : 180;
+     return mc(`En vinkel på <b>${v}°</b> er …`, ty, ['spids', 'ret', 'stump', 'lige'].filter(x => x !== ty), { visual: angleSVG(v), hint: 'Spids: under 90°. Ret: præcis 90°. Stump: mellem 90° og 180°. Lige: 180°.', explain: `${v}° er ${ty === 'spids' ? 'under 90°, så den er spids' : ty === 'ret' ? 'præcis 90°, så den er ret' : ty === 'stump' ? 'mellem 90° og 180°, så den er stump' : '180°, så den er lige'}.` });
+   } },
+   { id: '4b', name: 'Vinkelsum', gen() {
+     if (Math.random() < .6) { const a = R(25, 100), b = R(20, 150 - a), c = 180 - a - b; return num(`I en trekant er to af vinklerne <b>${a}°</b> og <b>${b}°</b>. Hvor stor er den tredje vinkel?`, c, { unit: '°', hint: 'Vinklerne i en trekant giver tilsammen 180°.', explain: `180° − ${a}° − ${b}° = ${c}°.` }); }
+     let a, b, c, d; do { a = R(50, 130); b = R(50, 130); c = R(50, 130); d = 360 - a - b - c; } while (d < 40 || d > 170);
+     return num(`I en firkant er tre af vinklerne <b>${a}°</b>, <b>${b}°</b> og <b>${c}°</b>. Hvor stor er den fjerde?`, d, { unit: '°', hint: 'Vinklerne i en firkant giver tilsammen 360°.', explain: `360° − ${a}° − ${b}° − ${c}° = ${d}°.` });
+   } },
+   { id: '4c', name: 'Trekanter og firkanter', gen() {
+     const q = pick([
+       ['En trekant med tre lige lange sider kaldes …', 'ligesidet', ['ligebenet', 'retvinklet', 'stumpvinklet'], regPts(3)],
+       ['En trekant med to lige lange sider kaldes …', 'ligebenet', ['ligesidet', 'retvinklet', 'spidsvinklet'], [[60, 12], [30, 108], [90, 108]]],
+       ['En trekant med én vinkel på 90° kaldes …', 'retvinklet', ['ligesidet', 'stumpvinklet', 'spidsvinklet'], [[20, 100], [100, 100], [20, 20]]],
+       ['En firkant med fire rette vinkler og fire lige lange sider er et …', 'kvadrat', ['rektangel', 'rombe', 'trapez'], [[20, 20], [100, 20], [100, 100], [20, 100]]],
+       ['En firkant, hvor begge par modstående sider er parallelle, er et …', 'parallelogram', ['trapez', 'drage', 'kvadrat'], [[10, 95], [80, 95], [110, 30], [40, 30]]],
+       ['En firkant med netop ét par parallelle sider er et …', 'trapez', ['parallelogram', 'rektangel', 'rombe'], [[10, 95], [110, 95], [85, 30], [35, 30]]],
+       ['En firkant med fire lige lange sider, men uden rette vinkler, er en …', 'rombe', ['kvadrat', 'trapez', 'rektangel'], [[60, 10], [100, 60], [60, 110], [20, 60]]],
+       ['En polygon med 6 sider kaldes en …', 'sekskant', ['femkant', 'ottekant', 'syvkant'], regPts(6)],
+       ['En polygon med 5 sider kaldes en …', 'femkant', ['sekskant', 'firkant', 'ottekant'], regPts(5)],
+       ['En polygon med 8 sider kaldes en …', 'ottekant', ['sekskant', 'syvkant', 'tikant'], regPts(8)]]);
+     return mc(q[0], q[1], q[2], { visual: polySVG(q[3], 130), hint: 'Se på siderne og vinklerne. Hvad er ens?', explain: `Svaret er ${q[1]}.` });
+   } },
+   { id: '4d', name: 'Areal af figurer', gen() {
+     const t = R(0, 2);
+     if (t === 0) { if (Math.random() < .4) return num('Hvorfor A4? Et A4-ark er ca. <b>21 cm</b> bredt og <b>30 cm</b> højt. Hvor stort er arealet?', 630, { unit: 'cm²', hint: 'Areal af et rektangel = længde · bredde.', explain: '21 · 30 = 630 cm².' }); const a = R(3, 15), b = R(2, 12); return num('Hvor stort er arealet af rektanglet?', a * b, { visual: areaSVG('rect', a, b), unit: 'cm²', hint: 'Areal = længde · bredde.', explain: `${a} · ${b} = ${a * b} cm².` }); }
+     if (t === 1) { let g, h; do { g = R(4, 16); h = R(3, 12); } while ((g * h) % 2); return num('Vikingeteltets gavl er en trekant. Hvor stort er arealet?', g * h / 2, { visual: areaSVG('tri', g, h), unit: 'cm²', hint: 'Areal af en trekant = grundlinje · højde : 2.', explain: `${g} · ${h} : 2 = ${g * h} : 2 = ${g * h / 2} cm².` }); }
+     const g = R(4, 14), h = R(3, 10); return num('Hvor stort er arealet af parallelogrammet?', g * h, { visual: areaSVG('para', g, h), unit: 'cm²', hint: 'Areal af et parallelogram = grundlinje · højde.', explain: `${g} · ${h} = ${g * h} cm². (Den skrå side bruges ikke.)` });
+   } },
+   { id: '4e', name: 'Omkreds af polygoner', gen() {
+     if (Math.random() < .5) { const l = R(3, 25), b = R(2, 15); return num(`Et rektangulært flag er <b>${l} cm</b> langt og <b>${b} cm</b> bredt. Hvor lang er omkredsen?`, 2 * (l + b), { unit: 'cm', hint: 'Omkredsen er alle siderne lagt sammen.', explain: `${l} + ${b} + ${l} + ${b} = ${2 * (l + b)} cm.` }); }
+     const [n, nm] = pick([[3, 'ligesidet trekant'], [5, 'regulær femkant'], [6, 'regulær sekskant'], [8, 'regulær ottekant']]), s = R(2, 15);
+     return num(`En glasmosaik er en <b>${nm}</b> med sider på <b>${s} cm</b>. Hvor lang er omkredsen?`, n * s, { visual: polySVG(regPts(n), 120), unit: 'cm', hint: 'Alle sider er lige lange. Hvor mange sider er der?', explain: `${n} sider · ${s} cm = ${n * s} cm.` });
+   } },
+   { id: '4f', name: 'Vinkler i polygoner', gen() {
+     const nm = { 3: 'trekant', 4: 'firkant', 5: 'femkant', 6: 'sekskant', 8: 'ottekant', 10: 'tikant', 12: 'tolvkant' };
+     if (Math.random() < .5) { const n = pick([4, 5, 6, 8]); return num(`Hvad er vinkelsummen i en <b>${nm[n]}</b>?`, (n - 2) * 180, { unit: '°', visual: polySVG(regPts(n), 110), hint: 'Del figuren op i trekanter fra ét hjørne. Hver trekant giver 180°.', explain: `En ${nm[n]} kan deles i ${n - 2} trekanter: ${n - 2} · 180° = ${(n - 2) * 180}°.` }); }
+     const n = pick([4, 5, 6, 8, 10, 12]); return num(`Hvor stor er hver vinkel i en <b>regulær ${nm[n]}</b>?`, (n - 2) * 180 / n, { unit: '°', visual: polySVG(regPts(n), 110), hint: `Find vinkelsummen og del med ${n}.`, explain: `Vinkelsum: ${n - 2} · 180° = ${(n - 2) * 180}°. Hver vinkel: ${(n - 2) * 180} : ${n} = ${(n - 2) * 180 / n}°.` });
+   } },
+   ] },
+ { n: 5, name: 'Data og chance', area: 'Statistik · sandsynlighed', viden: '114–117',
+   goal: 'Sammenligne datasæt ud fra hyppigheder, frekvenser og enkle statistiske deskriptorer; undersøge chancestørrelser.',
+   skills: [
+   { id: '5a', name: 'Gennemsnit', gen() {
+     const k = R(4, 6), v = Array.from({ length: k }, () => R(3, 25)), s0 = v.reduce((a, b) => a + b, 0); v[k - 1] += (k - s0 % k) % k;
+     const s = v.reduce((a, b) => a + b, 0);
+     return num(`Trafiktælling: Antal biler på ${k} forskellige 10-minutters perioder. Hvad er gennemsnittet?${chips(v)}`, s / k, { unit: 'biler', hint: 'Læg alle tallene sammen og del med, hvor mange tal der er.', explain: `${v.join(' + ')} = ${s}. ${s} : ${k} = ${s / k}.` });
+   } },
+   { id: '5b', name: 'Median', gen() {
+     const k = pick([5, 7, 5, 6]), v = Array.from({ length: k }, () => R(1, 30)), s = v.slice().sort((a, b) => a - b);
+     const med = k % 2 ? s[(k - 1) / 2] : (s[k / 2 - 1] + s[k / 2]) / 2;
+     return num(`Dåsekast: Holdets point blev disse. Hvad er medianen?${chips(v)}`, med, { unit: 'point', hint: k % 2 ? 'Sortér tallene fra mindst til størst og find tallet i midten.' : 'Sortér tallene. Der er to tal i midten – find tallet midt imellem dem.', explain: `Sorteret: ${s.join(', ')}. ${k % 2 ? `Tallet i midten er ${med}.` : `De to midterste er ${s[k / 2 - 1]} og ${s[k / 2]}. Midt imellem er ${nf(med)}.`}` });
+   } },
+   { id: '5c', name: 'Typetal og variationsbredde', gen() {
+     const mode = R(3, 20), v = shuf([mode, mode, mode, ...Array.from({ length: 4 }, () => { let x; do { x = R(1, 25); } while (x === mode); return x; })]);
+     if (Math.random() < .5) return num(`Hvad er <b>typetallet</b>?${chips(v)}`, mode, { hint: 'Typetallet er det tal, der forekommer flest gange.', explain: `${mode} forekommer 3 gange – flere gange end noget andet tal.` });
+     const mx = Math.max(...v), mn = Math.min(...v);
+     return num(`Hvad er <b>variationsbredden</b>?${chips(v)}`, mx - mn, { hint: 'Største tal minus mindste tal.', explain: `Største: ${mx}. Mindste: ${mn}. ${mx} − ${mn} = ${mx - mn}.` });
+   } },
+   { id: '5d', name: 'Hyppighed og frekvens', gen() {
+     let n, p; do { n = pick([20, 25, 40, 50, 200]); p = R(1, 19) * 5; } while (!Number.isInteger(n * p / 100));
+     const h = n * p / 100;
+     if (Math.random() < .6) return num(`Dåsen blev kastet <b>${n}</b> gange og landede på siden <b>${h}</b> gange. Hvad er frekvensen i procent?`, p, { unit: '%', hint: 'Frekvens = hyppighed : antal forsøg. Gang med 100 for at få procent.', explain: `${h} : ${n} = ${nf(h / n)} = ${p} %.` });
+     return num(`I ${n} kast med en tegnestift landede den med spidsen op i <b>${p} %</b> af kastene. Hvad er hyppigheden – altså hvor mange gange?`, h, { unit: 'gange', hint: `Find ${p} % af ${n}.`, explain: `${p} % af ${n} = ${n} · ${p} : 100 = ${h} gange.` });
+   } },
+   { id: '5e', name: 'Sandsynlighed', gen() {
+     const t = R(0, 2);
+     if (t === 0) {
+       const r = R(1, 6), b = R(1, 6), g = R(1, 5), T = r + b + g, [c, nm] = pick([[r, 'rød'], [b, 'blå'], [g, 'grøn']]);
+       const val = c / T, opts = [fr(T - c === 0 ? 1 : c, T - c || 1), fr(1, 3), fr(c, T + 1), fr(c + 1, T)].filter((h, i) => { const m = strip(h).split('/'); return Math.abs(m[0] / m[1] - val) > 1e-9; });
+       return mc(`Hvad gemmer posen? Der er <b>${r} røde</b>, <b>${b} blå</b> og <b>${g} grønne</b> kugler. Du trækker én uden at kigge. Hvad er sandsynligheden for en <b>${nm}</b>?`, fr(c, T), opts, { hint: 'Sandsynlighed = gunstige udfald : mulige udfald.', explain: `Der er ${c} ${nm === 'rød' ? 'røde' : nm === 'blå' ? 'blå' : 'grønne'} ud af ${T} kugler i alt. Sandsynligheden er ${c}/${T}.` });
+     }
+     if (t === 1) {
+       const [ev, k] = pick([['et lige tal', 3], ['en sekser', 1], ['mere end 4', 2], ['mindst 3', 4], ['et primtal (2, 3 eller 5)', 3], ['et tal under 3', 2]]);
+       return mc(`Du slår med en almindelig terning. Hvad er sandsynligheden for at slå <b>${ev}</b>?`, fr(k, 6), [fr(k + 1, 6), fr(k, 12), fr(6 - k === k ? k + 2 : 6 - k, 6)], { hint: 'En terning har 6 mulige udfald. Hvor mange af dem passer?', explain: `${k} ud af 6 udfald passer, så sandsynligheden er ${k}/6.` });
+     }
+     const q = pick([['at slå 7 med én almindelig terning', 'umuligt'], ['at solen står op i morgen', 'sikkert'], ['at få plat, når man slår plat og krone', 'lige så sandsynligt som ikke'], ['at slå en sekser med én terning', 'usandsynligt']]);
+     return mc(`Hvor sandsynligt er det ${q[0]}?`, q[1], ['umuligt', 'usandsynligt', 'lige så sandsynligt som ikke', 'sikkert'].filter(x => x !== q[1]), { hint: 'Sandsynligheder går fra 0 (umuligt) til 1 (sikkert).', explain: `Det er ${q[1]}.` });
+   } },
+   { id: '5f', name: 'Fart', gen() {
+     const t = R(0, 2);
+     if (t === 0) { const v = R(4, 20) * 5, h = R(2, 4); return num(`Fartmåling: En bil kører <b>${v * h} km</b> på <b>${h} timer</b>. Hvad er farten?`, v, { unit: 'km/t', hint: 'Fart = strækning : tid.', explain: `${v * h} : ${h} = ${v} km/t.` }); }
+     if (t === 1) { const v = R(12, 24), h = R(2, 4); return num(`En cyklist kører med <b>${v} km/t</b> i <b>${h} timer</b>. Hvor langt kommer hun?`, v * h, { unit: 'km', hint: 'Strækning = fart · tid.', explain: `${v} · ${h} = ${v * h} km.` }); }
+     const v = R(3, 8), s = pick([10, 20, 25]); return num(`En løber løber <b>${v * s} m</b> på <b>${s} sekunder</b>. Hvad er farten?`, v, { unit: 'm/s', hint: 'Fart = strækning : tid.', explain: `${v * s} : ${s} = ${v} m/s.` });
+   } },
+   ] },
+ { n: 6, name: 'Tal og bogstaver', area: 'Algebra', viden: '136–139',
+   goal: 'Algebra: variable, formler, ligninger, mønstre og primtal.',
+   skills: [
+   { id: '6a', name: 'Indsæt i udtryk', gen() {
+     const x = R(2, 9), a = R(2, 9), b = R(1, 12), f = pick([
+       [`${a} · <i>x</i> + ${b}`, a * x + b, `${a} · ${x} + ${b} = ${a * x} + ${b}`],
+       [`${a} · <i>x</i> − ${b}`, a * x - b, `${a} · ${x} − ${b} = ${a * x} − ${b}`],
+       [`<i>x</i>² + ${b}`, x * x + b, `${x}² + ${b} = ${x * x} + ${b}`],
+       [`${a} · (<i>x</i> + ${b})`, a * (x + b), `${a} · (${x} + ${b}) = ${a} · ${x + b}`]]);
+     return num(`Hvad er <span class="big">${f[0]}</span> når <i>x</i> = ${x}?`, f[1], { hint: `Skriv ${x} i stedet for x – og husk: gange før plus og minus.`, explain: `${f[2]} = ${sg(f[1])}.` });
+   } },
+   { id: '6b', name: 'Ligninger', gen() {
+     const x = R(1, 15), a = R(2, 9), b = R(1, 20), f = pick([
+       [`<i>x</i> + ${b} = ${x + b}`, `Træk ${b} fra på begge sider: x = ${x + b} − ${b} = ${x}.`],
+       [`<i>x</i> − ${b} = ${x - b}`.replace('= -', '= −'), `Læg ${b} til på begge sider: x = ${sg(x - b)} + ${b} = ${x}.`],
+       [`${a} · <i>x</i> = ${a * x}`, `Del med ${a} på begge sider: x = ${a * x} : ${a} = ${x}.`],
+       [`${a} · <i>x</i> + ${b} = ${a * x + b}`, `Træk ${b} fra: ${a} · x = ${a * x}. Del med ${a}: x = ${x}.`]]);
+     return num(`Løs ligningen <span class="big">${f[0]}</span>`, x, { pre: 'x =', hint: 'Gør det samme på begge sider af lighedstegnet, til x står alene.', explain: f[1] });
+   } },
+   { id: '6c', name: 'Formler', gen() {
+     const t = R(0, 3);
+     if (t === 0) { const l = R(3, 20), b = R(2, 12); return num(`Formlen for omkredsen af et rektangel er <b>O = 2 · l + 2 · b</b>. Find O, når l = ${l} og b = ${b}.`, 2 * l + 2 * b, { hint: 'Indsæt tallene og regn gange først.', explain: `2 · ${l} + 2 · ${b} = ${2 * l} + ${2 * b} = ${2 * l + 2 * b}.` }); }
+     if (t === 1) { const k = R(2, 12); return num(`Bistader: Hvert bistade giver 12 kg honning. Formlen er <b>h = 12 · k</b>, hvor k er antal bistader. Hvor meget honning giver ${k} bistader?`, 12 * k, { unit: 'kg', hint: `Indsæt ${k} i stedet for k.`, explain: `h = 12 · ${k} = ${12 * k} kg.` }); }
+     if (t === 2) { const km = R(2, 15); return num(`En taxa koster <b>pris = 40 + 12 · km</b>. Hvad koster en tur på ${km} km?`, 40 + 12 * km, { unit: 'kr.', hint: 'Gange før plus.', explain: `40 + 12 · ${km} = 40 + ${12 * km} = ${40 + 12 * km} kr.` }); }
+     const v = pick([3, 4, 5]), h = R(2, 6); return num(`Vandreturen: Tiden findes med <b>t = s : v</b>. I går ${v} km i timen. Hvor mange timer tager ${v * h} km?`, h, { unit: 'timer', hint: 'Indsæt strækningen s og farten v.', explain: `t = ${v * h} : ${v} = ${h} timer.` });
+   } },
+   { id: '6d', name: 'Mønstre og figurtal', gen() {
+     let a, b; do { a = R(2, 5); b = R(1, 4); } while (a === b);
+     const f = n => a * n + b, seq = [f(1), f(2), f(3)];
+     if (Math.random() < .55) { const N = pick([10, 12, 15, 20]); return num(`En stabel: Figur 1 har <b>${seq[0]}</b> tændstikker, figur 2 har <b>${seq[1]}</b>, figur 3 har <b>${seq[2]}</b>. Hvor mange har figur ${N}?`, f(N), { hint: `Der kommer ${a} til hver gang. Hvad skal du lægge til ${a} · n?`, explain: `Der kommer ${a} til hver gang, så formlen er ${a} · n + ${b}. Figur ${N}: ${a} · ${N} + ${b} = ${f(N)}.` }); }
+     return mc(`Figur 1 har <b>${seq[0]}</b> kvadrater, figur 2 har <b>${seq[1]}</b>, figur 3 har <b>${seq[2]}</b>. Hvilken formel passer for figur n?`, `${a} · n + ${b}`, [`${b} · n + ${a}`, `${a + b} · n`, `n + ${a}`], { hint: 'Hvor mange kommer der til hver gang? Det tal ganges med n.', explain: `Der kommer ${a} til hver gang. Tjek figur 1: ${a} · 1 + ${b} = ${seq[0]}. Formlen er ${a} · n + ${b}.` });
+   } },
+   { id: '6e', name: 'Primtal', gen() {
+     const P = [11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97], C = [21, 27, 33, 39, 49, 51, 57, 63, 69, 77, 81, 87, 91, 93];
+     if (Math.random() < .6) { const p = pick(P), w = shuf(C).slice(0, 3); return mc('Hvilket af tallene er et <b>primtal</b>?', String(p), w.map(String), { hint: 'Et primtal kan kun deles med 1 og sig selv. Prøv at dele med 3 og 7.', explain: `${p} kan kun deles med 1 og ${p}. De andre: ${w.map(c => { const d = [3, 7, 13].find(d => c % d === 0); return `${c} = ${d} · ${c / d}`; }).join(', ')}.` }); }
+     const n = R(10, 88), nxt = P.concat([2, 3, 5, 7]).sort((a, b) => a - b).find(p => p > n);
+     return num(`Hvad er det første primtal, der er større end <b>${n}</b>?`, nxt, { hint: 'Tjek tallene ét ad gangen. Lige tal (undtagen 2) er aldrig primtal.', explain: `${nxt} kan kun deles med 1 og sig selv, og der er ikke noget primtal mellem ${n} og ${nxt}.` });
+   } },
+   { id: '6f', name: 'Regnehierarki', gen() {
+     const a = R(2, 12), b = R(2, 9), c = R(2, 9), f = pick([
+       [`${a} + ${b} · ${c}`, a + b * c, `Gange først: ${b} · ${c} = ${b * c}. Så ${a} + ${b * c} = ${a + b * c}.`],
+       [`(${a} + ${b}) · ${c}`, (a + b) * c, `Parentesen først: ${a} + ${b} = ${a + b}. Så ${a + b} · ${c} = ${(a + b) * c}.`],
+       [`${a + b * c} − ${b * c} : ${c}`, a + b * c - b, `Division først: ${b * c} : ${c} = ${b}. Så ${a + b * c} − ${b} = ${a + b * c - b}.`],
+       [`${a} · ${b} − ${c}`, a * b - c, `Gange først: ${a} · ${b} = ${a * b}. Så ${a * b} − ${c} = ${a * b - c}.`]]);
+     return num(`Udregn <span class="big">${f[0]}</span>`, f[1], { hint: 'Parenteser først. Så gange og division. Til sidst plus og minus.', explain: f[2] });
+   } },
+   ] },
+ { n: 7, name: 'Rum og tegning', area: 'Måling · geometri · tegning', viden: '160–163',
+   goal: 'Anvende skitser og præcise tegninger; rumfang og overflade af kasser.',
+   skills: [
+   { id: '7a', name: 'Rumfang af kasser', gen() {
+     const l = R(2, 12), b = R(2, 10), h = R(2, 10);
+     return num(`Olsen flytter: En kasse er <b>${l} cm</b> lang, <b>${b} cm</b> bred og <b>${h} cm</b> høj. Hvad er rumfanget?`, l * b * h, { unit: 'cm³', hint: 'Rumfang = længde · bredde · højde.', explain: `${l} · ${b} · ${h} = ${l * b * h} cm³.` });
+   } },
+   { id: '7b', name: 'Liter og rumfang', gen() {
+     if (Math.random() < .5) { const l = pick([30, 40, 50, 60, 80, 100]), b = pick([20, 30, 40]), h = pick([20, 30, 40, 50]), v = l * b * h; return num(`Et akvarium er <b>${l} cm</b> langt, <b>${b} cm</b> bredt og <b>${h} cm</b> højt. Hvor mange liter kan det rumme?`, v / 1000, { unit: 'liter', hint: '1 liter = 1000 cm³. Eller: regn i dm (10 cm = 1 dm), for 1 dm³ = 1 liter.', explain: `${l} · ${b} · ${h} = ${nf(v, 0)} cm³. ${nf(v, 0)} : 1000 = ${nf(v / 1000)} liter.` }); }
+     const q = pick([['1 liter er det samme som …', '1 dm³', ['1 cm³', '1 m³', '10 cm³'], '1 liter = 1 dm³ = 1000 cm³.'], ['Hvor mange cm³ er 1 liter?', '1000', ['100', '10', '10.000'], '1 liter = 1000 cm³.'], ['Hvor mange liter er 2500 cm³?', '2,5', ['25', '250', '0,25'], '2500 : 1000 = 2,5 liter.'], ['Hvor mange liter er 750 ml?', '0,75', ['7,5', '75', '0,075'], '1 liter = 1000 ml. 750 : 1000 = 0,75 liter.'], ['Malerbøtten rummer 5 liter. Hvor mange dl er det?', '50', ['500', '5', '0,5'], '1 liter = 10 dl. 5 · 10 = 50 dl.']]);
+     return mc(q[0], q[1], q[2], { hint: '1 liter = 10 dl = 100 cl = 1000 ml = 1000 cm³.', explain: q[3] });
+   } },
+   { id: '7c', name: 'Overflade', gen() {
+     if (Math.random() < .35) { const s = R(2, 9); return num(`Hvor meget hud? En terning har sider på <b>${s} cm</b>. Hvor stort er overfladearealet?`, 6 * s * s, { unit: 'cm²', hint: 'En terning har 6 ens kvadratiske sider.', explain: `Én side: ${s} · ${s} = ${s * s}. Seks sider: 6 · ${s * s} = ${6 * s * s} cm².` }); }
+     const l = R(2, 8), b = R(2, 6), h = R(1, 6), A = 2 * (l * b + l * h + b * h);
+     return num(`En kasse af pap er <b>${l} cm</b> lang, <b>${b} cm</b> bred og <b>${h} cm</b> høj. Hvor meget pap skal der bruges (overfladeareal)?`, A, { unit: 'cm²', hint: 'Kassen har 6 sider – tre par, der er ens. Find arealet af hvert par.', explain: `Top/bund: 2 · ${l} · ${b} = ${2 * l * b}. For/bag: 2 · ${l} · ${h} = ${2 * l * h}. Sider: 2 · ${b} · ${h} = ${2 * b * h}. I alt ${A} cm².` });
+   } },
+   { id: '7d', name: 'Rumlige figurer', gen() {
+     const q = pick([['Hvor mange flader har en terning?', '6', ['4', '8', '12'], 'En terning har 6 flader, 12 kanter og 8 hjørner.'], ['Hvor mange kanter har en terning?', '12', ['6', '8', '10'], 'En terning har 12 kanter: 4 foroven, 4 forneden og 4 lodrette.'], ['Hvor mange hjørner har en terning?', '8', ['6', '4', '12'], '4 hjørner foroven og 4 forneden.'], ['Hvor mange flader har en pyramide med kvadratisk bund?', '5', ['4', '6', '8'], '1 bund + 4 trekanter = 5 flader.'], ['Hvor mange flader har et trekantet prisme?', '5', ['3', '6', '9'], '2 trekanter + 3 rektangler = 5 flader.'], ['Eulers formel for polyedre: Flader + Hjørner − Kanter = ?', '2', ['0', '1', '4'], 'F + H − K = 2. Terning: 6 + 8 − 12 = 2.'], ['En fodbold er syet af femkanter og …', 'sekskanter', ['firkanter', 'trekanter', 'ottekanter'], 'En klassisk fodbold har 12 femkanter og 20 sekskanter.']]);
+     return mc(q[0], q[1], q[2], { hint: 'Forestil dig figuren – eller tegn den.', explain: q[3] });
+   } },
+   { id: '7e', name: 'Målestok', gen() {
+     const m = pick([50, 100, 200]);
+     if (Math.random() < .55) { const cm = R(2, 15), real = cm * m / 100; return num(`Tegnedag i 6.c: På en tegning i målestok <b>1:${m}</b> er en væg <b>${cm} cm</b>. Hvor lang er den i virkeligheden?`, real, { unit: 'm', hint: `1 cm på tegningen er ${m} cm i virkeligheden.`, explain: `${cm} · ${m} = ${cm * m} cm = ${nf(real)} m.` }); }
+     const mm = R(2, 12), d = mm * 100 / m; return num(`Et rum er <b>${mm} m</b> langt. Hvor langt bliver det på en tegning i målestok <b>1:${m}</b>?`, d, { unit: 'cm', hint: `Lav meter om til cm, og del med ${m}.`, explain: `${mm} m = ${mm * 100} cm. ${mm * 100} : ${m} = ${nf(d)} cm.` });
+   } },
+   ] },
+ { n: 8, name: 'Mønstre og figurer', area: 'Geometri · placeringer og flytninger', viden: '180–181',
+   goal: 'Undersøge geometriske egenskaber ved plane figurer; spejling, parallelforskydning og drejning.',
+   skills: [
+   { id: '8a', name: 'Symmetriakser', gen() {
+     const s = pick([['et kvadrat', 4, [[20, 20], [100, 20], [100, 100], [20, 100]]], ['et rektangel', 2, [[10, 35], [110, 35], [110, 90], [10, 90]]], ['en ligesidet trekant', 3, regPts(3)], ['en regulær sekskant', 6, regPts(6)], ['en regulær femkant', 5, regPts(5)], ['en ligebenet trekant', 1, [[60, 12], [30, 108], [90, 108]]], ['et parallelogram', 0, [[10, 95], [80, 95], [110, 30], [40, 30]]], ['en rombe', 2, [[60, 10], [95, 60], [60, 110], [25, 60]]]]);
+     return num(`Hvor mange symmetriakser har <b>${s[0]}</b>?`, s[1], { visual: polySVG(s[2], 130), hint: 'En symmetriakse deler figuren i to halvdele, der er hinandens spejlbilleder.', explain: `${s[0][0].toUpperCase() + s[0].slice(1)} har ${s[1]} symmetriakse${s[1] === 1 ? '' : 'r'}.${s[1] === 0 ? ' Et parallelogram kan ikke foldes, så halvdelene passer.' : ''}` });
+   } },
+   { id: '8b', name: 'Spejling', gen() {
+     const x = pick([-1, 1]) * R(1, 7), y = pick([-1, 1]) * R(1, 7), ax = pick(['x', 'y']);
+     const P = (a, b) => `(${sg(a)}, ${sg(b)})`, ans = ax === 'y' ? P(-x, y) : P(x, -y);
+     return mc(`Punktet A ${P(x, y)} spejles i <b>${ax}-aksen</b>. Hvad bliver koordinaterne?`, ans, [ax === 'y' ? P(x, -y) : P(-x, y), P(-x, -y), P(y, x)], { visual: coordSVG([{ x, y, l: 'A' }], ax), hint: ax === 'y' ? 'Ved spejling i y-aksen skifter x-koordinaten fortegn.' : 'Ved spejling i x-aksen skifter y-koordinaten fortegn.', explain: `Spejling i ${ax}-aksen: ${ax === 'y' ? 'x' : 'y'} skifter fortegn. ${P(x, y)} bliver ${ans}.` });
+   } },
+   { id: '8c', name: 'Parallelforskydning', gen() {
+     const x = R(-5, 5), y = R(-5, 5), dx = pick([-1, 1]) * R(1, 4), dy = pick([-1, 1]) * R(1, 4), P = (a, b) => `(${sg(a)}, ${sg(b)})`;
+     const txt = `${Math.abs(dx)} til ${dx > 0 ? 'højre' : 'venstre'} og ${Math.abs(dy)} ${dy > 0 ? 'op' : 'ned'}`;
+     return mc(`Punktet A ${P(x, y)} flyttes <b>${txt}</b>. Hvor ender det?`, P(x + dx, y + dy), [P(x + dy, y + dx), P(x - dx, y - dy), P(x + dx, y - dy)], { visual: coordSVG([{ x, y, l: 'A' }]), hint: 'Højre/venstre ændrer x. Op/ned ændrer y.', explain: `x: ${sg(x)} ${dx > 0 ? '+' : '−'} ${Math.abs(dx)} = ${sg(x + dx)}. y: ${sg(y)} ${dy > 0 ? '+' : '−'} ${Math.abs(dy)} = ${sg(y + dy)}. A ender i ${P(x + dx, y + dy)}.` });
+   } },
+   { id: '8d', name: 'Drejning', gen() {
+     const [n, nm] = pick([[3, 'ligesidet trekant'], [4, 'kvadrat'], [5, 'regulær femkant'], [6, 'regulær sekskant'], [8, 'regulær ottekant']]);
+     if (Math.random() < .6) return num(`Et <b>${nm}</b> drejes om sit centrum. Hvad er den mindste drejning, hvor figuren ser ens ud igen?`, 360 / n, { unit: '°', visual: polySVG(regPts(n), 110), hint: `En hel omgang er 360°. Figuren har ${n} ens hjørner.`, explain: `360° : ${n} = ${360 / n}°.` });
+     const k = pick([3, 4, 5, 6]); return num(`En vindmølle har <b>${k}</b> ens vinger. Hvor mange gange ser den ens ud, når den drejer én hel omgang? (Det kaldes ordenen af drejningssymmetrien.)`, k, { hint: 'Tæl, hvor mange gange en vinge kommer op i toppen på én omgang.', explain: `Hver gang den drejer 360° : ${k} = ${360 / k}°, ser den ens ud. Det sker ${k} gange.` });
+   } },
+   { id: '8e', name: 'Gentagne mønstre', gen() {
+     const L = R(3, 5), base = shuf(Object.keys(COLS)), seq = Array.from({ length: L }, (_, i) => i < 3 ? base[i] : pick(base.slice(0, 3)));
+     const p = R(13, 41), r = (p - 1) % L, ans = seq[r];
+     return mc(`Vævestuen: Mønstret gentager sig. Hvilken farve har tråd nr. <b>${p}</b>?`, ans, shuf(Object.keys(COLS).filter(c => c !== ans)).slice(0, 3), { visual: patternSVG(seq, 2), hint: `Mønstret er ${L} tråde langt. Del ${p} med ${L} og se på resten.`, explain: `${p} : ${L} = ${Math.floor(p / L)} rest ${p % L}. ${p % L === 0 ? `Rest 0 betyder den sidste i mønstret` : `Rest ${p % L} betyder tråd nr. ${p % L} i mønstret`}: ${ans}.` });
+   } },
+   ] },
+];
+const SK = {}; CH.forEach(c => c.skills.forEach(s => { s.ch = c.n; SK[s.id] = s; }));
+
+/* ---------- calendar: Kontext+ 6, 5 teaching weeks per chapter ---------- */
+const HOLIDAY_MONDAYS = ['2026-10-12', '2026-12-21', '2026-12-28', '2027-02-15', '2027-03-22'];
+const dkey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const today = () => dkey(new Date());
+const parse = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+const daysBetween = (a, b) => Math.round((parse(b) - parse(a)) / 864e5);
+const addDays = (k, n) => { const d = parse(k); d.setDate(d.getDate() + n); return dkey(d); };
+function teachingWeeks() { const out = []; let d = new Date(2026, 7, 10); while (out.length < 40) { const k = dkey(d); if (!HOLIDAY_MONDAYS.includes(k)) out.push(k); d.setDate(d.getDate() + 7); } return out; }
+const TW = teachingWeeks();
+function autoChapter() {
+  const t = today(); let idx = -1;
+  TW.forEach((m, i) => { if (m <= t) idx = i; });
+  if (idx < 0) return 1;
+  return Math.min(8, Math.floor(idx / 5) + 1);
+}
+function chapterWeeks(n) { const a = TW[(n - 1) * 5], b = TW[(n - 1) * 5 + 4]; const f = k => parse(k).toLocaleDateString('da-DK', { day: 'numeric', month: 'short' }); return `${f(a)} – ${f(addDays(b, 4))}`; }
+
+/* ---------- state ---------- */
+const KEY = 'talbane-roberta-v1';
+const blank = () => ({ v: 1, name: '', created: today(), xp: 0, streak: { count: 0, last: null, shields: 0, best: 0 }, days: {}, skills: {}, badges: {}, totals: { n: 0, c: 0, first: 0, second: 0, hints: 0 }, bestCombo: 0, rounds: [], log: [], settings: { chapter: 'auto', len: 8 }, imported: null });
+let S = load();
+function load() { try { const r = localStorage.getItem(KEY); if (r) return Object.assign(blank(), JSON.parse(r)); } catch (e) {} return blank(); }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+const curChapter = () => S.settings.chapter === 'auto' ? autoChapter() : Number(S.settings.chapter);
+const sk = id => S.skills[id] || (S.skills[id] = { n: 0, c: 0, f: 0, box: 0, due: null, last: null, h: [] });
+const stars = id => { const s = S.skills[id]; if (!s || !s.n) return 0; return s.box >= 5 ? 3 : s.box >= 3 ? 2 : s.box >= 1 ? 1 : 0; };
+const INTERVAL = [0, 1, 2, 4, 7, 14];
+
+/* levels */
+const TITLES = ['Regne-rookie', 'Tal-spotter', 'Brøk-bryder', 'Mønster-jæger', 'Formel-finder', 'Vinkel-vogter', 'Procent-pro', 'Data-detektiv', 'Algebra-agent', 'Geometri-guru', 'Matematik-mester', 'Legende'];
+const need = L => 50 * L * (L - 1);
+const levelOf = xp => { let L = 1; while (xp >= need(L + 1)) L++; return L; };
+const titleOf = L => L <= TITLES.length ? TITLES[L - 1] : `Legende ${L - TITLES.length + 1}`;
+
+/* streak */
+function streakAlive() { const st = S.streak; if (!st.last) return 0; const g = daysBetween(st.last, today()); return g <= 1 + st.shields ? st.count : 0; }
+function bumpStreak() {
+  const st = S.streak, t = today(); let used = 0;
+  if (st.last === t) return 0;
+  if (!st.last) st.count = 1;
+  else { const g = daysBetween(st.last, t); if (g === 1) st.count++; else { const miss = g - 1; if (miss <= st.shields) { st.shields -= miss; used = miss; st.count++; } else st.count = 1; } }
+  st.last = t; if (st.count % 7 === 0 && st.shields < 2) st.shields++;
+  st.best = Math.max(st.best, st.count); return used;
+}
+
+/* badges */
+const BADGES = [
+  ['first', '1', 'Første runde'], ['s3', '3', '3 dage i træk'], ['s7', '7', 'En hel uge'], ['s14', '14', 'To uger i træk'], ['s30', '30', 'En måned i træk'],
+  ['perfect', '★', 'Fejlfri runde'], ['nohint', '!', 'Ingen hints'], ['combo5', '×5', '5 i træk'], ['combo10', '×10', '10 i træk'], ['comeback', '↻', 'Giver ikke op'],
+  ['c100', '100', '100 rigtige'], ['c500', '500', '500 rigtige'],
+  ...CH.map(c => ['ch' + c.n, 'K' + c.n, 'Mester: ' + c.name])];
+function award(id, list) { if (!S.badges[id]) { S.badges[id] = today(); list.push(id); } }
+function checkBadges(list, round) {
+  const st = S.streak.count;
+  if (S.rounds.length) award('first', list);
+  if (st >= 3) award('s3', list); if (st >= 7) award('s7', list); if (st >= 14) award('s14', list); if (st >= 30) award('s30', list);
+  if (S.bestCombo >= 5) award('combo5', list); if (S.bestCombo >= 10) award('combo10', list);
+  if (S.totals.second >= 10) award('comeback', list);
+  if (S.totals.c >= 100) award('c100', list); if (S.totals.c >= 500) award('c500', list);
+  if (round) { if (round.perfect) award('perfect', list); if (round.hints === 0 && round.items.length >= 6) award('nohint', list); }
+  CH.forEach(c => { if (c.skills.every(s => stars(s.id) >= 2)) award('ch' + c.n, list); });
+}
+
+/* ---------- round building ---------- */
+function weakest(ids, k) {
+  const t = today();
+  const scored = ids.map(id => { const s = S.skills[id]; const due = !s || !s.due || s.due <= t; return { id, sc: (due ? 0 : 10) + (s ? s.box : 0) + Math.random() * 1.5 }; });
+  return scored.sort((a, b) => a.sc - b.sc).slice(0, k).map(x => x.id);
+}
+function buildDaily() {
+  const c = curChapter(), L = S.settings.len, cur = CH[c - 1].skills.map(s => s.id);
+  const prev = CH.slice(0, c - 1).flatMap(ch => ch.skills.map(s => s.id));
+  const nRev = prev.length ? Math.min(3, Math.round(L * .375)) : 0, nCur = L - nRev;
+  const curPick = []; while (curPick.length < nCur) curPick.push(...weakest(cur, Math.min(cur.length, nCur - curPick.length)));
+  const rev = weakest(prev, nRev);
+  const order = []; let ci = 0, ri = 0;
+  for (let i = 0; i < L; i++) { const wantRev = rev.length && ri < rev.length && (i % 3 === 2 || ci >= curPick.length); order.push(wantRev ? { id: rev[ri++], rev: true } : { id: curPick[ci++] }); }
+  return order;
+}
+function makeRound(mode, ids) { return { mode, items: ids.map(x => ({ id: x.id, rev: !!x.rev, q: SK[x.id].gen() })), i: 0, xp: 0, combo: 0, hints: 0, first: 0, correct: 0, extra: 0, start: Date.now(), res: [] }; }
+
+/* ---------- answer checking ---------- */
+function parseNum(s) {
+  s = String(s).trim().replace(/[−–]/g, '-').replace(/\s/g, '').replace(/(kr\.?|%|°|cm³|cm²|cm|m|km\/t|liter|l)$/i, '');
+  if (/^-?\d+\/\d+$/.test(s)) { const [a, b] = s.split('/').map(Number); return b ? a / b : NaN; }
+  if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+  else if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');
+  return s === '' || s === '-' ? NaN : Number(s);
+}
+const isRight = (q, v) => q.type === 'mc' ? v === q.answer : Math.abs(parseNum(v) - q.answer) <= q.tol + 1e-9;
+const answerText = q => q.type === 'mc' ? q.answer : `${q.pre ? q.pre + ' ' : ''}${nf(q.answer, 2)}${q.unit ? ' ' + q.unit : ''}`;
+
+function recordSkill(id, result) { // result: 'first' | 'second' | 'wrong'
+  const s = sk(id), t = today();
+  s.n++; if (result !== 'wrong') s.c++; if (result === 'first') s.f++;
+  if (result === 'first') s.box = Math.min(5, s.box + 1); else if (result === 'wrong') s.box = Math.max(0, s.box - 2);
+  s.due = addDays(t, INTERVAL[s.box]); s.last = t; s.h.push(result === 'first' ? 2 : result === 'second' ? 1 : 0); if (s.h.length > 8) s.h.shift();
+  S.totals.n++; if (result !== 'wrong') S.totals.c++; if (result === 'first') S.totals.first++; if (result === 'second') S.totals.second++;
+}
+
+/* ---------- UI bits ---------- */
+const STAR = '<svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.5 6 .7-4.4 4.1 1.2 6-5.4-3-5.4 3 1.2-6L1.4 7.7l6-.7z"/></svg>';
+const starRow = n => `<span class="stars" aria-label="${n} af 3 stjerner">${[0, 1, 2].map(i => `<span class="${i < n ? 'on' : ''}">${STAR}</span>`).join('')}</span>`;
+const FLAME = on => `<svg class="flame ${on ? '' : 'off'}" viewBox="0 0 30 36" aria-hidden="true"><path d="M15 1c2 7 9 10 9 19a9 9 0 0 1-18 0c0-5 3-7 4-11 1 3 2 5 4 6-1-5 0-10 1-14z"/></svg>`;
+const SHIELD = '<svg class="shield" viewBox="0 0 12 14"><path d="M6 0l6 2v5c0 4-3 6-6 7-3-1-6-3-6-7V2z"/></svg>';
+function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2200); }
+function burst() { if (matchMedia('(prefers-reduced-motion: reduce)').matches) return; const b = document.createElement('div'); b.className = 'burst'; const cs = ['#2b55c8', '#f2c230', '#ea6a22', '#16804c', '#e05a47']; for (let i = 0; i < 46; i++) { const p = document.createElement('i'); p.style.left = Math.random() * 100 + '%'; p.style.background = cs[i % cs.length]; p.style.animationDelay = Math.random() * .5 + 's'; b.appendChild(p); } document.body.appendChild(b); setTimeout(() => b.remove(), 2600); }
+
+let view = 'home', R0 = null, practiceCh = null, parentTab = 'overblik', resetArm = false;
+
+function header() {
+  const L = levelOf(S.xp), a = need(L), b = need(L + 1), pct = Math.round((S.xp - a) / (b - a) * 100), st = streakAlive();
+  return `<div class="top">
+    <div class="lvl"><span class="eyebrow">Niveau ${L}</span><h1>Hej ${esc(S.name || '')}</h1>
+      <div class="row" style="gap:8px"><b>${titleOf(L)}</b><span class="muted num">${S.xp - a} / ${b - a} XP til niveau ${L + 1}</span></div>
+      <div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div></div>
+    <div class="streak">${FLAME(st > 0)}<div><b class="num">${st}</b><small>${st === 1 ? 'dag' : 'dage'} i træk</small>${S.streak.shields ? `<div class="shields" title="Skjolde redder din stribe, hvis du springer en dag over">${SHIELD.repeat(S.streak.shields)}</div>` : ''}</div></div>
+  </div>`;
+}
+
+function nameView() {
+  return `<section class="sticker round"><span class="eyebrow">Velkommen til Talbanen</span><h1>Hvad hedder du?</h1><p class="muted">Din matematikbane til Kontext+ 6. Skriv dit fornavn, så er du klar.</p><form id="nameform" class="ans" autocomplete="off"><label class="inwrap"><input id="namein" maxlength="24" aria-label="Dit fornavn"></label><button class="btn primary" type="submit">Start</button></form></section>`;
+}
+function homeView() {
+  if (!S.name) return nameView();
+  const t = today(), c = curChapter(), ch = CH[c - 1], doneToday = !!(S.days[t] && S.days[t].r);
+  const L = S.settings.len, nRev = c > 1 ? Math.min(3, Math.round(L * .375)) : 0;
+  const monday = (() => { const d = new Date(); const wd = (d.getDay() + 6) % 7; d.setDate(d.getDate() - wd); return dkey(d); })();
+  const week = ['Ma', 'Ti', 'On', 'To', 'Fr', 'Lø', 'Sø'].map((n, i) => { const k = addDays(monday, i), on = S.days[k] && S.days[k].r; return `<div class="day ${on ? 'on' : ''} ${k === t ? 'today' : ''}"><i>${on ? '' : ''}</i><span>${n}</span></div>`; }).join('');
+  const roundCard = doneToday
+    ? `<div class="sticker round"><div class="done-msg"><div class="check"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><div><h2>Dagens runde er klaret</h2><p class="muted">Din stribe er sikret i dag. Vil du have flere XP, kan du tage en runde mere.</p></div></div>
+       <div class="row"><button class="btn primary" data-act="daily">Tag en ekstra runde</button><button class="btn" data-act="practice">Fri træning</button></div></div>`
+    : `<div class="sticker round"><span class="eyebrow">Dagens runde</span><h2>${L} opgaver · ca. ${Math.round(L * .8)} minutter</h2>
+       <div class="meta"><span class="tag cur">${L - nRev} × Kap. ${c} ${ch.name}</span>${nRev ? `<span class="tag">${nRev} × gentagelse fra tidligere kapitler</span>` : ''}</div>
+       <p class="muted">Klar dagens runde for at holde din stribe i live.</p>
+       <div class="row"><button class="btn primary" data-act="daily" id="startbtn">Start dagens runde</button></div></div>`;
+  const map = CH.map(x => { const avg = x.skills.reduce((a, s) => a + stars(s.id), 0) / x.skills.length, cls = x.n === c ? 'now' : x.n > c ? 'later' : ''; return `<button class="chap ${cls}" data-act="chap" data-ch="${x.n}"><span class="n">${x.n}</span><span class="t">${x.name}</span>${starRow(Math.floor(avg + 0.001))}<span class="s">${x.n === c ? 'Nu i klassen' : x.n < c ? 'Gennemgået' : 'Kommer ' + chapterWeeks(x.n).split(' – ')[0]}</span></button>`; }).join('');
+  const badges = BADGES.map(([id, g, nm]) => `<div class="badge ${S.badges[id] ? 'got' : ''}"><div class="medal">${g}</div><span>${nm}</span></div>`).join('');
+  return `${header()}${roundCard}
+  <section><div class="row" style="justify-content:space-between"><h2>Ugen</h2><span class="muted">${Object.keys(S.badges).length} af ${BADGES.length} mærker</span></div><div class="week">${week}</div></section>
+  <section><h2>Årets bane</h2><p class="muted">Kontext+ 6 – kapitlerne i den rækkefølge, I har dem i klassen. Tryk på et kapitel for at træne det.</p><div class="map">${map}</div></section>
+  <section><h2>Mærker</h2><div class="badges">${badges}</div></section>
+  <div class="foot"><div class="row"><button class="btn" data-act="practice">Fri træning</button><button class="btn" data-act="send">Send status til far</button></div><button class="btn ghost small" data-act="parent">Til far ›</button></div>`;
+}
+
+function practiceView() {
+  const c = practiceCh || curChapter(), ch = CH[c - 1];
+  const tabs = CH.map(x => `<button data-act="pch" data-ch="${x.n}" aria-pressed="${x.n === c}">${x.n}</button>`).join('');
+  const rows = ch.skills.map(s => { const st = S.skills[s.id]; return `<div class="panel row" style="justify-content:space-between"><div style="min-width:0"><h3>${s.name}</h3><div class="row" style="gap:8px">${starRow(stars(s.id))}<span class="muted" style="font-size:.85rem">${st && st.n ? `${st.c} af ${st.n} rigtige` : 'Ikke prøvet endnu'}</span></div></div><button class="btn small" data-act="drill" data-sk="${s.id}">Øv 5</button></div>`; }).join('');
+  return `<div class="row" style="justify-content:space-between"><button class="btn ghost small" data-act="home">‹ Tilbage</button><span class="muted">Fri træning giver XP, men tæller ikke som dagens runde</span></div>
+  <section><span class="eyebrow">Kapitel ${c} · ${ch.area}</span><h1>${ch.name}</h1><div class="tabs" role="group" aria-label="Vælg kapitel">${tabs}</div>
+  <p class="muted">Læs mere i bogen: Viden om, s. ${ch.viden}</p>
+  <button class="btn primary" data-act="mixch" data-ch="${c}" style="align-self:flex-start">Bland hele kapitlet · 8 opgaver</button>${rows}</section>`;
+}
+
+function quizView() {
+  const r = R0, it = r.items[r.i], q = it.q, s = SK[it.id], ch = CH[s.ch - 1];
+  const prog = r.items.map((x, i) => `<i class="${x.res === 'first' ? 'ok' : x.res === 'second' ? 'half' : x.res === 'wrong' ? 'no' : i === r.i ? 'cur' : ''}"></i>`).join('');
+  let ans = '';
+  if (q.type === 'mc') ans = `<div class="choices">${q.choices.map((c, i) => { const cls = it.final && c === q.answer ? 'right' : (it.tried || []).includes(c) ? 'picked-wrong' : ''; const dis = it.final || (it.tried || []).includes(c); return `<button class="choice ${cls}" data-act="mc" data-i="${i}" ${dis ? 'disabled' : ''}><span class="k">${'ABCD'[i]}</span><span>${c}</span></button>`; }).join('')}</div>`;
+  else ans = `<form class="ans" id="numform" autocomplete="off"><label class="inwrap ${it.final ? (it.res === 'wrong' ? 'bad' : 'good') : it.tries ? 'bad' : ''}">${q.pre ? `<span class="unit" style="padding:0 8px 0 0">${q.pre}</span>` : ''}<input id="numin" inputmode="decimal" aria-label="Dit svar" value="${esc(it.val || '')}" ${it.final ? 'disabled' : ''}>${q.unit ? `<span class="unit">${q.unit}</span>` : ''}</label>${it.final ? '' : '<button class="btn primary" type="submit">Tjek</button>'}</form>`;
+  let fb = '';
+  if (it.final) fb = it.res === 'wrong'
+    ? `<div class="fb bad"><strong>Det var en svær en. Sådan gør man:</strong><p>${q.explain}</p><p>Svaret er <b>${answerText(q)}</b>.</p><span class="book">Mere i bogen: Viden om, s. ${ch.viden} · Du får en lignende opgave senere i runden.</span></div>`
+    : `<div class="fb good"><strong>${it.praise} <span class="xpfloat">+${it.gain} XP</span></strong><p>${q.explain}</p></div>`;
+  else if (it.tries) fb = `<div class="fb try"><strong>Ikke helt – prøv igen.</strong><div class="hintbox">${q.hint}</div></div>`;
+  else if (it.hint) fb = `<div class="hintbox">${q.hint}</div>`;
+  const title = r.mode === 'daily' ? 'Dagens runde' : 'Træning';
+  return `<div class="qtop"><button class="btn ghost small" data-act="quit" aria-label="Afbryd runden">✕</button><div class="prog" aria-label="Opgave ${r.i + 1} af ${r.items.length}">${prog}</div><span class="combo">${r.combo >= 2 ? '×' + r.combo : ''}</span></div>
+  <div class="sticker qcard"><span class="eyebrow">${title} · Kap. ${s.ch} ${ch.name} · ${s.name}${it.rev ? ' · gentagelse' : ''}</span>
+    <div class="qtext">${q.text}</div>${q.visual || ''}${ans}${fb}
+    <div class="qactions">${it.final ? '<span></span>' : `<button class="btn ghost small" data-act="hint" ${it.hint || it.tries ? 'disabled' : ''}>Vis hint (giver 5 XP i stedet for 10)</button>`}${it.final ? `<button class="btn primary" data-act="next" id="nextbtn">${r.i + 1 < r.items.length ? 'Næste' : 'Se resultat'} →</button>` : ''}</div>
+  </div><p class="muted" style="font-size:.85rem">Tip: Tryk Enter for at tjekke eller gå videre. Tast 1–4 for at vælge et svar.</p>`;
+}
+
+const PRAISE = ['Sådan!', 'Flot regnet!', 'Præcis!', 'Skarpt!', 'Rigtigt!', 'Godt tænkt!', 'Klaret!'];
+function submit(val) {
+  const r = R0, it = r.items[r.i], q = it.q;
+  if (it.final) return;
+  if (q.type === 'num') { it.val = val; if (isNaN(parseNum(val))) { toast('Skriv et tal – brug komma til decimaler'); return; } }
+  if (isRight(q, val)) {
+    const res = it.tries || it.hint ? 'second' : 'first';
+    let gain = res === 'first' ? 10 : 5; r.combo++; S.bestCombo = Math.max(S.bestCombo, r.combo); if (r.combo >= 3) gain += 5;
+    it.res = res; it.gain = gain; it.final = true; it.praise = r.combo >= 3 ? `${r.combo} i træk!` : pick(PRAISE);
+    r.xp += gain; S.xp += gain; r.correct++; if (res === 'first') r.first++;
+    recordSkill(it.id, res);
+  } else if (!it.tries) {
+    it.tries = 1; if (q.type === 'mc') (it.tried = it.tried || []).push(val); r.combo = 0; if (!it.hint) { it.hint = true; r.hints++; S.totals.hints++; }
+  } else {
+    if (q.type === 'mc') (it.tried = it.tried || []).push(val);
+    it.res = 'wrong'; it.final = true; r.combo = 0; recordSkill(it.id, 'wrong');
+    S.log.unshift({ d: today(), sk: it.id, q: strip(q.text).slice(0, 220), a: q.type === 'mc' ? strip(val) : String(val), r: strip(answerText(q)) }); S.log = S.log.slice(0, 30);
+    if (r.extra < 2) { r.items.push({ id: it.id, rev: it.rev, q: SK[it.id].gen(), again: true }); r.extra++; }
+  }
+  save(); render();
+}
+
+function finishRound() {
+  const r = R0, ms = Date.now() - r.start, t = today(), n = r.items.length;
+  r.perfect = r.first === n; let bonus = 0, usedShield = 0, newStreak = false;
+  if (r.mode === 'daily') {
+    const d = S.days[t] || (S.days[t] = { r: 0, q: 0, c: 0, ms: 0 });
+    const firstToday = !d.r; d.r++; d.q += n; d.c += r.correct; d.ms += ms;
+    if (firstToday) { usedShield = bumpStreak(); newStreak = true; }
+    bonus = 20 + (r.perfect ? 20 : 0);
+  } else { const d = S.days[t] || (S.days[t] = { r: 0, q: 0, c: 0, ms: 0 }); d.q += n; d.c += r.correct; d.ms += ms; bonus = r.perfect ? 10 : 0; }
+  S.xp += bonus; r.xp += bonus;
+  S.rounds.unshift({ d: t, m: r.mode, n, c: r.correct, f: r.first, xp: r.xp, ms, h: r.hints, ch: curChapter() }); S.rounds = S.rounds.slice(0, 120);
+  const nb = []; checkBadges(nb, r); r.newBadges = nb; r.usedShield = usedShield; r.newStreak = newStreak; r.ms = ms;
+  const weak = {}; r.items.forEach(x => { if (x.res !== 'first') weak[x.id] = 1; }); r.weak = Object.keys(weak);
+  save(); view = 'done'; render(); if (r.first >= n * .75 || nb.length) burst();
+}
+
+function doneView() {
+  const r = R0, n = r.items.length, L = levelOf(S.xp);
+  const msg = r.perfect ? 'Fejlfri runde. Det er stærkt.' : r.first >= n * .75 ? 'Rigtig flot runde.' : r.correct >= n * .5 ? 'Godt kæmpet – du gav ikke op.' : 'Det var svære opgaver i dag. Det er sådan, man lærer.';
+  const nb = r.newBadges.map(id => { const b = BADGES.find(x => x[0] === id); return `<div class="badge got"><div class="medal">${b[1]}</div><span>${b[2]}</span></div>`; }).join('');
+  return `<div class="sticker result"><span class="eyebrow">${r.mode === 'daily' ? 'Dagens runde klaret' : 'Træning klaret'}</span>
+    <div class="bignum num">${r.correct} <span style="font-size:1.4rem" class="muted">af ${n} rigtige</span></div><p>${msg}</p>
+    <div class="stats"><div class="stat"><b>+${r.xp}</b><span>XP · niveau ${L}</span></div><div class="stat"><b>${streakAlive()}</b><span>${r.newStreak ? 'dage i træk (+1)' : 'dage i træk'}</span></div><div class="stat"><b>${Math.max(1, Math.round(r.ms / 60000))} min</b><span>tid brugt</span></div></div>
+    ${r.usedShield ? `<p class="hintbox">Et skjold reddede din stribe, fordi du sprang ${r.usedShield === 1 ? 'en dag' : r.usedShield + ' dage'} over.</p>` : ''}
+    ${nb ? `<div><h3 style="margin-bottom:10px">Nye mærker</h3><div class="newbadges">${nb}</div></div>` : ''}
+    ${r.weak.length ? `<div><h3>Øv mere på</h3><p class="muted">${r.weak.map(id => SK[id].name).join(' · ')}</p></div>` : ''}
+    <div class="row"><button class="btn primary" data-act="home" id="homebtn">Til forsiden</button>${r.weak.length ? `<button class="btn" data-act="drill" data-sk="${r.weak[0]}">Øv ${SK[r.weak[0]].name.toLowerCase()}</button>` : ''}</div></div>`;
+}
+
+/* ---------- export / import ---------- */
+function b64(bytes) { let s = ''; for (let i = 0; i < bytes.length; i += 8192) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 8192)); return btoa(s); }
+function unb64(s) { const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+async function encode() {
+  const o = Object.assign({}, S, { exportedAt: new Date().toISOString(), imported: null }); const txt = JSON.stringify(o);
+  try { if ('CompressionStream' in window) { const st = new Blob([txt]).stream().pipeThrough(new CompressionStream('deflate-raw')); return 'TB1.' + b64(new Uint8Array(await new Response(st).arrayBuffer())); } } catch (e) {}
+  return 'TB0.' + b64(new TextEncoder().encode(txt));
+}
+async function decode(code) {
+  code = code.replace(/\s/g, ''); const [p, body] = [code.slice(0, 4), code.slice(4)];
+  if (p === 'TB1.') { const st = new Blob([unb64(body)]).stream().pipeThrough(new DecompressionStream('deflate-raw')); return JSON.parse(await new Response(st).text()); }
+  if (p === 'TB0.') return JSON.parse(new TextDecoder().decode(unb64(body)));
+  throw new Error('format');
+}
+
+function sendView() {
+  return `<div class="row"><button class="btn ghost small" data-act="home">‹ Tilbage</button></div>
+  <section><h1>Send status til far</h1><p>Koden herunder indeholder dine fremskridt: stribe, XP, mærker, og hvilke emner du er god til og skal øve. Kopiér den, og send den til far i en besked. Så kan han se, hvordan det går.</p>
+  <textarea id="code" readonly aria-label="Din statuskode">Laver koden …</textarea>
+  <div class="row"><button class="btn primary" data-act="copy">Kopiér kode</button><span class="muted" style="font-size:.9rem">Koden er også en backup. Mister du dine data, kan far gendanne dem med den.</span></div></section>`;
+}
+
+/* ---------- parent ---------- */
+function statusOf(id) {
+  const s = S.skills[id]; if (!s || !s.n) return ['none', 'Ikke øvet'];
+  const acc = s.f / s.n; if (s.n >= 3 && acc < .5) return ['bad', 'Øv mere']; if (s.box >= 4) return ['ok', 'Sikker']; return ['mid', 'På vej'];
+}
+function parentView() {
+  const t = today(), c = curChapter();
+  const last = k => Array.from({ length: k }, (_, i) => addDays(t, -i));
+  const d7 = last(7), roundsWeek = d7.filter(k => S.days[k] && S.days[k].r).length;
+  const r7 = S.rounds.filter(r => daysBetween(r.d, t) < 7), q7 = r7.reduce((a, r) => a + r.n, 0), f7 = r7.reduce((a, r) => a + r.f, 0);
+  const avgMin = r7.length ? Math.round(r7.reduce((a, r) => a + r.ms, 0) / r7.length / 6000) / 10 : 0;
+  const start = addDays(t, -27), wd = (parse(start).getDay() + 6) % 7, calStart = addDays(start, -wd);
+  const span = daysBetween(calStart, t) + 1;
+  const cal = Array.from({ length: span }, (_, i) => { const k = addDays(calStart, i), d = S.days[k]; return `<i class="${d && d.r ? 'on' : d && d.q ? 'part' : ''} ${k === t ? 'today' : ''}" title="${k}${d ? ` · ${d.c}/${d.q} rigtige` : ''}"></i>`; }).join('');
+  const tabs = ['overblik', 'emner', 'fejl', 'indstillinger'].map(x => `<button data-act="ptab" data-tab="${x}" aria-pressed="${parentTab === x}">${{ overblik: 'Overblik', emner: 'Emner', fejl: 'Seneste fejl', indstillinger: 'Indstillinger' }[x]}</button>`).join('');
+  const banner = S.imported ? `<div class="banner">Du ser ${esc(S.name || 'hendes')}s data fra en kode, sendt ${new Date(S.imported).toLocaleString('da-DK', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}.</div>` : '';
+  let body = '';
+  if (parentTab === 'overblik') {
+    const practiced = Object.keys(S.skills).filter(id => S.skills[id].n);
+    const strong = practiced.filter(id => S.skills[id].n >= 2).sort((a, b) => (S.skills[b].box - S.skills[a].box) || (S.skills[b].f / S.skills[b].n - S.skills[a].f / S.skills[a].n)).slice(0, 2);
+    let weak = practiced.filter(id => S.skills[id].n >= 2).sort((a, b) => (S.skills[a].f / S.skills[a].n - S.skills[b].f / S.skills[b].n) || (S.skills[a].box - S.skills[b].box)).filter(id => !strong.includes(id)).slice(0, 2);
+    if (weak.length < 2) weak = weak.concat(CH[c - 1].skills.map(s => s.id).filter(id => !weak.includes(id) && !strong.includes(id) && stars(id) < 2).slice(0, 2 - weak.length));
+    const talk = `<div class="talk">
+      <div class="item"><h3>Start med det, der går godt</h3><p>${S.streak.count >= 2 ? `Hun har en stribe på ${streakAlive()} dage. ` : ''}${strong.length ? `Hun er sikrest i <b>${strong.map(id => SK[id].name.toLowerCase()).join('</b> og <b>')}</b>.` : 'Når hun har taget et par runder, kan du se her, hvad hun er stærkest i.'}</p></div>
+      <div class="item warn"><h3>Løs en opgave sammen</h3><p class="muted">Lad hende forklare, hvordan hun tænker, før I ser svaret.</p>${weak.map(id => `<div class="together" data-sk="${id}"><span class="eyebrow">${SK[id].name} · Kap. ${SK[id].ch}</span><div class="slot"></div><div class="row"><button class="btn small" data-act="tq" data-sk="${id}">Ny opgave</button><button class="btn small ghost" data-act="ta">Vis svar</button></div><div class="sol" hidden></div></div>`).join('')}</div>
+      <div class="item"><h3>Spørg hende</h3><p>Hvad laver I i matematik lige nu? Hvad var det sværeste i denne uge? Hvilken opgave i dag var du mest stolt af?</p></div></div>`;
+    body = `<div class="kv"><div class="stat"><b>${roundsWeek}/7</b><span>dage med runde, sidste uge</span></div><div class="stat"><b>${q7 ? Math.round(f7 / q7 * 100) : '–'}${q7 ? ' %' : ''}</b><span>rigtige i første forsøg</span></div><div class="stat"><b>${avgMin || '–'}${avgMin ? ' min' : ''}</b><span>pr. runde i snit</span></div><div class="stat"><b>${levelOf(S.xp)}</b><span>niveau · ${S.xp} XP</span></div></div>
+      <section><h2>Sidste 4 uger</h2><div class="cal" aria-label="Kalender over dage med runde">${cal}</div><p class="muted" style="font-size:.85rem">Orange: dagens runde klaret. Gul: kun fri træning. Ma–Sø fra venstre.</p></section>
+      <section><h2>Til jeres snak</h2>${talk}</section>`;
+  } else if (parentTab === 'emner') {
+    body = CH.map(ch => `<section><div><span class="eyebrow">Kap. ${ch.n} · ${chapterWeeks(ch.n)}${ch.n === c ? ' · nu' : ''}</span><h2>${ch.name}</h2><p class="goal">Fælles Mål: ${ch.goal}</p></div><div class="tbl-wrap"><table><thead><tr><th>Emne</th><th>Status</th><th>Første forsøg</th><th>Sidst øvet</th></tr></thead><tbody>${ch.skills.map(s => { const st = S.skills[s.id], [cls, lab] = statusOf(s.id); return `<tr><td>${s.name}<br>${starRow(stars(s.id))}</td><td><span class="pill ${cls}">${lab}</span></td><td class="n">${st && st.n ? `${st.f}/${st.n}` : '–'}</td><td class="n">${st && st.last ? parse(st.last).toLocaleDateString('da-DK', { day: 'numeric', month: 'short' }) : '–'}</td></tr>`; }).join('')}</tbody></table></div></section>`).join('');
+  } else if (parentTab === 'fejl') {
+    body = S.log.length ? `<section><h2>Opgaver hun ikke fik rigtige</h2><p class="muted">De seneste ${S.log.length}. Gode at tage op sammen – spørg, hvordan hun regnede.</p><div class="log">${S.log.map(l => `<div><span class="eyebrow">${parse(l.d).toLocaleDateString('da-DK', { day: 'numeric', month: 'short' })} · ${SK[l.sk] ? SK[l.sk].name : ''}</span><p>${esc(l.q)}</p><p>Hendes svar: <b>${esc(l.a)}</b> · Rigtigt svar: <b>${esc(l.r)}</b></p></div>`).join('')}</div></section>` : '<p class="muted">Ingen fejl endnu. Når hun svarer forkert to gange på en opgave, kommer den med her.</p>';
+  } else {
+    body = `<section class="panel"><h2>Kapitel i klassen lige nu</h2><p class="muted">Automatisk ud fra årsplanen (5 uger pr. kapitel fra skolestart, uden ferieuger). Hvis klassen er et andet sted, så vælg kapitlet her.</p>
+      <select id="chsel" aria-label="Kapitel"><option value="auto" ${S.settings.chapter === 'auto' ? 'selected' : ''}>Automatisk (nu: kap. ${autoChapter()} ${CH[autoChapter() - 1].name})</option>${CH.map(x => `<option value="${x.n}" ${String(S.settings.chapter) === String(x.n) ? 'selected' : ''}>Kap. ${x.n} ${x.name}</option>`).join('')}</select></section>
+      <section class="panel"><h2>Længde på dagens runde</h2><select id="lensel" aria-label="Antal opgaver">${[6, 8, 10, 12].map(n => `<option value="${n}" ${S.settings.len === n ? 'selected' : ''}>${n} opgaver (ca. ${Math.round(n * .8)} min)</option>`).join('')}</select></section>
+      <section class="panel"><h2>Indlæs statuskode</h2><p class="muted">Indsæt den statuskode, du har fået tilsendt. Det erstatter dataene i denne browser – brug det på din egen computer, eller til at gendanne hendes data.</p><textarea id="incode" aria-label="Statuskode" placeholder="TB1.…"></textarea><div class="row"><button class="btn primary" data-act="import">Indlæs kode</button></div></section>
+      <section class="panel"><h2>Nulstil</h2><p class="muted">Sletter alle fremskridt i denne browser.</p><div class="row"><button class="btn small" data-act="reset">${resetArm ? 'Tryk igen for at slette alt' : 'Nulstil alt'}</button>${resetArm ? '<button class="btn small ghost" data-act="unreset">Fortryd</button>' : ''}</div></section>`;
+  }
+  return `<div class="row" style="justify-content:space-between"><button class="btn ghost small" data-act="home">‹ Tilbage</button></div>
+  <section><span class="eyebrow">Til far</span><h1>${S.name ? esc(S.name) + 's fremskridt' : 'Fremskridt'}</h1>${banner}<div class="tabs" role="tablist">${tabs}</div></section>${body}`;
+}
+
+function fillTogether(box) {
+  const id = box.dataset.sk, q = SK[id].gen();
+  box.querySelector('.slot').innerHTML = `<div class="qtext" style="font-size:1.1rem">${q.text}</div>${q.visual || ''}${q.type === 'mc' ? `<p class="muted">Svarmuligheder: ${q.choices.join(' · ')}</p>` : ''}`;
+  const sol = box.querySelector('.sol'); sol.hidden = true; sol.innerHTML = `<div class="fb good"><strong>Svar: ${answerText(q)}</strong><p>${q.explain}</p></div>`;
+}
+
+/* ---------- render + events ---------- */
+function render() {
+  if (view === 'home') app.innerHTML = homeView();
+  else if (view === 'practice') app.innerHTML = practiceView();
+  else if (view === 'quiz') app.innerHTML = quizView();
+  else if (view === 'done') app.innerHTML = doneView();
+  else if (view === 'send') { app.innerHTML = sendView(); encode().then(c => { const t = document.getElementById('code'); if (t) t.value = c; }); }
+  else if (view === 'parent') { app.innerHTML = parentView(); app.querySelectorAll('.together').forEach(fillTogether); }
+  if (view === 'quiz') { const it = R0.items[R0.i]; if (it.final) document.getElementById('nextbtn')?.focus(); else document.getElementById('numin')?.focus(); }
+}
+function go(v) { view = v; resetArm = false; render(); window.scrollTo(0, 0); }
+function startRound(mode, ids) { R0 = makeRound(mode, ids); go('quiz'); }
+
+app.addEventListener('submit', e => { if (e.target.id === 'nameform') { e.preventDefault(); const v = document.getElementById('namein').value.trim(); if (v) { S.name = v.slice(0, 24); save(); render(); } return; } if (e.target.id === 'numform') { e.preventDefault(); submit(document.getElementById('numin').value); } });
+app.addEventListener('change', e => {
+  if (e.target.id === 'chsel') { S.settings.chapter = e.target.value; save(); toast('Kapitel gemt'); render(); }
+  if (e.target.id === 'lensel') { S.settings.len = Number(e.target.value); save(); toast('Længde gemt'); }
+});
+app.addEventListener('click', async e => {
+  const b = e.target.closest('[data-act]'); if (!b) return; const a = b.dataset.act;
+  if (a === 'home') go('home');
+  else if (a === 'daily') startRound('daily', buildDaily());
+  else if (a === 'practice') { practiceCh = null; go('practice'); }
+  else if (a === 'chap') { practiceCh = Number(b.dataset.ch); go('practice'); }
+  else if (a === 'pch') { practiceCh = Number(b.dataset.ch); render(); }
+  else if (a === 'drill') startRound('practice', Array(5).fill(0).map(() => ({ id: b.dataset.sk })));
+  else if (a === 'mixch') { const ids = CH[Number(b.dataset.ch) - 1].skills.map(s => s.id); startRound('practice', shuf(ids.concat(ids)).slice(0, 8).map(id => ({ id }))); }
+  else if (a === 'mc') submit(R0.items[R0.i].q.choices[Number(b.dataset.i)]);
+  else if (a === 'hint') { const it = R0.items[R0.i]; if (!it.hint) { it.hint = true; R0.hints++; S.totals.hints++; save(); render(); } }
+  else if (a === 'next') { if (R0.i + 1 < R0.items.length) { R0.i++; render(); } else finishRound(); }
+  else if (a === 'quit') { if (R0 && R0.items.some(x => x.final)) { const d = S.days[today()] || (S.days[today()] = { r: 0, q: 0, c: 0, ms: 0 }); d.q += R0.items.filter(x => x.final).length; d.c += R0.items.filter(x => x.final && x.res !== 'wrong').length; save(); } go('home'); }
+  else if (a === 'send') go('send');
+  else if (a === 'copy') { const t = document.getElementById('code'); try { await navigator.clipboard.writeText(t.value); toast('Koden er kopieret'); } catch (err) { t.focus(); t.select(); toast('Markeret – tryk ⌘C for at kopiere'); } }
+  else if (a === 'parent') { parentTab = 'overblik'; go('parent'); }
+  else if (a === 'ptab') { parentTab = b.dataset.tab; resetArm = false; render(); }
+  else if (a === 'tq') fillTogether(b.closest('.together'));
+  else if (a === 'ta') { const s = b.closest('.together').querySelector('.sol'); s.hidden = !s.hidden; }
+  else if (a === 'import') { const v = document.getElementById('incode').value.trim(); if (!v) { toast('Indsæt en kode først'); return; } try { const o = await decode(v); if (!o || o.v !== 1) throw 0; S = Object.assign(blank(), o, { imported: o.exportedAt || new Date().toISOString() }); save(); parentTab = 'overblik'; toast('Koden er indlæst'); render(); } catch (err) { toast('Koden kunne ikke læses. Tjek at hele koden er kopieret med.'); } }
+  else if (a === 'reset') { if (!resetArm) { resetArm = true; render(); } else { S = blank(); save(); resetArm = false; toast('Alt er nulstillet'); go('home'); } }
+  else if (a === 'unreset') { resetArm = false; render(); }
+});
+document.addEventListener('keydown', e => {
+  if (view !== 'quiz' || !R0) return; const it = R0.items[R0.i];
+  if (e.key === 'Enter' && it.final) { e.preventDefault(); document.getElementById('nextbtn')?.click(); return; }
+  if (!it.final && it.q.type === 'mc' && /^[1-4]$/.test(e.key)) { const i = Number(e.key) - 1, c = it.q.choices[i]; if (c !== undefined && !(it.tried || []).includes(c)) submit(c); }
+});
+
+render();
+window.__talbane = { CH, SK, parseNum, isRight };
+})();
+</script>
+</body></html>
