@@ -256,6 +256,28 @@ button.tag:hover{border-color:var(--pen);color:var(--pen)}
 .mixer input[type=text]{font:inherit;border:2px solid var(--ink);border-radius:10px;padding:9px 10px;background:var(--card);color:var(--ink)}
 .linkbox{font-family:ui-monospace,Menlo,monospace;font-size:.8rem;width:100%;border:2px solid var(--ink);border-radius:10px;padding:10px;background:var(--paper);color:var(--ink);word-break:break-all}
 textarea.msgin{font-family:var(--body);font-size:1.05rem;min-height:90px;word-break:normal}
+/* v3: Kodeklubben + mood */
+.casecard{display:flex;align-items:center;gap:14px;text-align:left;width:100%;background:var(--card);border:2px solid var(--ink);border-left:10px solid var(--pen);border-radius:var(--r);padding:14px 16px;box-shadow:4px 4px 0 var(--shadow)}
+.casecard:hover{background:var(--pen-soft)}
+.casecard .ic{font-size:2rem;line-height:1}
+.casecard b{display:block;font-family:var(--display);font-size:1.2rem}
+.casecard small{color:var(--muted)}
+.casefile{background:var(--card);border:2px solid var(--ink);border-radius:var(--r);box-shadow:5px 5px 0 var(--shadow);padding:22px;display:flex;flex-direction:column;gap:14px;position:relative}
+.clue{border:2px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;background:var(--paper)}
+.clue.done{border-color:var(--good);background:var(--good-soft)}
+.clue.locked{border-style:dashed;opacity:.75}
+.clue .task{font-weight:700}
+.digit{display:inline-grid;place-items:center;width:34px;height:40px;border-radius:8px;background:var(--ink);color:var(--paper);font-family:var(--display);font-weight:800;font-size:1.3rem;margin-left:4px}
+.lock{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--pen-soft);border:2px solid var(--ink);border-radius:14px;padding:12px 14px;align-self:flex-start}
+.lockic{font-size:1.8rem;margin-right:4px}
+.lockd{width:42px;height:52px;border-radius:10px;border:2px dashed var(--muted);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:1.6rem;color:var(--muted);background:var(--card)}
+.lockd.on{border:2px solid var(--ink);color:var(--ink);background:var(--mark)}
+.final{display:flex;flex-direction:column;gap:12px;border-top:2px dashed var(--line);padding-top:14px}
+.solved{display:flex;flex-direction:column;gap:10px}
+.stamp{align-self:flex-start;border:3px solid var(--bad);color:var(--bad);font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:4px 12px;border-radius:8px;transform:rotate(-4deg)}
+.moodbox{width:100%;border:2px dashed var(--pen);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:10px;background:var(--pen-soft)}
+.moodrow{display:flex;gap:8px;flex-wrap:wrap}
+.moodrow span{border:1px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--paper);font-size:.9rem}
 @media (max-width:520px){.quick{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){.levelup,.stk.fresh{animation:none}}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;font-weight:700;z-index:9}
@@ -758,7 +780,9 @@ function chapterWeeks(n) { const a = TW[(n - 1) * 5], b = TW[(n - 1) * 5 + 4]; c
 const KEY = 'talbane-roberta-v1';
 const blank = () => ({ v: 1, name: '', searches: [], created: today(), xp: 0, streak: { count: 0, last: null, shields: 0, best: 0 }, days: {}, skills: {}, badges: {}, totals: { n: 0, c: 0, first: 0, second: 0, hints: 0 }, bestCombo: 0, rounds: [], log: [], settings: { chapter: 'auto', len: 8 }, imported: null,
   /* v2 fields – all optional, old data gets these defaults */
-  wk: { goal: 3, met: {} }, look: { theme: 'papir', custom: { name: 'Mit tema', paper: '#fff4e8', pen: '#e8457a', flame: '#ffb400', pattern: 'dots' } }, stickers: {}, mastered: {}, letters: [], v2: null });
+  wk: { goal: 3, met: {} }, look: { theme: 'papir', custom: { name: 'Mit tema', paper: '#fff4e8', pen: '#e8457a', flame: '#ffb400', pattern: 'dots' } }, stickers: {}, mastered: {}, letters: [], v2: null,
+  /* v3 fields */
+  myst: { cur: null, solved: {}, lastSolvedWeek: null, just: null }, mood: {}, v3: null });
 let S = load();
 function load() { try { const r = localStorage.getItem(KEY); if (r) return Object.assign(blank(), JSON.parse(r)); } catch (e) {} return blank(); }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
@@ -789,6 +813,7 @@ const BADGES = [
   ['first', '1', 'Første runde'], ['s3', '3', '3 dage i træk'], ['s7', '7', 'En hel uge'], ['s14', '14', 'To uger i træk'], ['s30', '30', 'En måned i træk'],
   ['perfect', '★', 'Fejlfri runde'], ['nohint', '!', 'Ingen hints'], ['combo5', '×5', '5 i træk'], ['combo10', '×10', '10 i træk'], ['comeback', '↻', 'Giver ikke op'],
   ['c100', '100', '100 rigtige'], ['c500', '500', '500 rigtige'],
+  ['m1', '🔍', 'Første sag opklaret'], ['m3', '🔍3', '3 sager opklaret'], ['m6', '🔍6', 'Alle 6 sager'],
   ['w1', 'U1', 'Første ugemål'], ['w4', 'U4', 'Ugemål 4 uger i træk'], ['w8', 'U8', 'Ugemål 8 uger i træk'], ['w12', 'U12', 'Ugemål 12 uger i træk'],
   ...CH.map(c => ['ch' + c.n, 'K' + c.n, 'Mester: ' + c.name])];
 const LEGACY = new Set(['s3', 's7', 's14', 's30']); // daily-streak badges: kept if earned, hidden otherwise
@@ -804,6 +829,7 @@ function checkBadges(list, round) {
   if (round) { if (round.perfect) award('perfect', list); if (round.hints === 0 && round.items.length >= 6) award('nohint', list); }
   CH.forEach(c => { if (c.skills.every(s => stars(s.id) >= 2)) award('ch' + c.n, list); });
   const ws = weekStreak();
+  const sc = Object.keys(S.myst.solved).length; if (sc >= 1) award('m1', list); if (sc >= 3) award('m3', list); if (sc >= 6) award('m6', list);
   if (ws >= 1) award('w1', list); if (ws >= 4) award('w4', list); if (ws >= 8) award('w8', list); if (ws >= 12) award('w12', list);
 }
 
@@ -908,7 +934,7 @@ function buildDaily() {
   for (let i = 0; i < L; i++) { const wantRev = rev.length && ri < rev.length && (i % 3 === 2 || ci >= curPick.length); order.push(wantRev ? { id: rev[ri++], rev: true } : { id: curPick[ci++] }); }
   return order;
 }
-function makeRound(mode, ids) { return { mode, items: ids.map(x => ({ id: x.id, rev: !!x.rev, q: SK[x.id].gen() })), i: 0, xp: 0, combo: 0, hints: 0, first: 0, correct: 0, extra: 0, start: Date.now(), res: [], startXp: S.xp, newMastered: [] }; }
+function makeRound(mode, ids) { return { mode, items: ids.map(x => ({ id: x.id, rev: !!x.rev, q: SK[x.id].gen() })), i: 0, xp: 0, combo: 0, hints: 0, first: 0, correct: 0, extra: 0, start: Date.now(), res: [], startXp: S.xp, newMastered: [], cluesBefore: mode === 'daily' ? cluesOpen(ensureCase()) : 0, caseBefore: S.myst.cur ? S.myst.cur.id : null }; }
 
 /* ---------- answer checking ---------- */
 function parseNum(s) {
@@ -994,12 +1020,13 @@ function homeView() {
        <div class="row"><button class="btn primary" data-act="daily" id="startbtn">Start dagens runde</button><button class="btn ghost" data-act="practice">Vælg selv emne</button></div></div>`;
   const unread = (S.letters || []).find(x => !x.read);
   const letter = unread ? `<div class="letter" role="status"><span class="eyebrow">Besked fra far${unread.t ? ' · ' + esc(new Date(unread.t).toLocaleDateString('da-DK', { day: 'numeric', month: 'long' })) : ''}</span><p class="msg">${esc(unread.m)}</p><div class="row"><button class="btn small primary" data-act="readletter">Tak, far!</button></div></div>` : '';
-  const newbox = !S.v2 ? `<div class="newbox"><h2>Nyt i Talbanen</h2><ul><li>Vælg dit eget tema – eller design dit helt eget.</li><li>Saml klistermærker i din bog, når du stiger i niveau, når du får styr på et emne, og når du når dit ugemål.</li><li>Ugemål: du bestemmer selv, hvor mange dage om ugen. Flammen tæller uger i træk.</li><li>Far kan sende dig beskeder, som står her på forsiden.</li></ul><div class="row"><button class="btn primary small" data-act="theme">Vælg mit tema</button><button class="btn small" data-act="v2ok">Fedt, luk</button></div></div>` : '';
+  const v2items = !S.v2 ? '<li>Vælg dit eget tema – eller design dit helt eget.</li><li>Saml klistermærker i din bog, når du stiger i niveau, når du får styr på et emne, og når du når dit ugemål.</li><li>Ugemål: du bestemmer selv, hvor mange dage om ugen. Flammen tæller uger i træk.</li><li>Far kan sende dig beskeder, som står her på forsiden.</li>' : '';
+  const newbox = !S.v3 ? `<div class="newbox"><h2>Nyt i Talbanen</h2><ul><li><b>Kodeklubben:</b> en hemmelig klub med en ny sag hver uge. Dine runder låser sporene op, og opgaverne i sporene giver koden til hængelåsen. Du er klubbens kodeknækker.</li>${v2items}</ul><div class="row"><button class="btn primary small" data-act="openclub">Åbn ugens sag</button>${!S.v2 ? '<button class="btn small" data-act="theme">Vælg mit tema</button>' : ''}<button class="btn small" data-act="v2ok">Fedt, luk</button></div></div>` : '';
   const quick = `<div class="quick"><button class="qbtn" data-act="theme"><span class="ic" aria-hidden="true">🎨</span><span><b>Mit tema</b><small>${esc(S.look.theme === 'mit' ? (S.look.custom.name || 'Mit tema') : (THEMES[S.look.theme] || THEMES.papir).name)}</small></span></button><button class="qbtn" data-act="stickers"><span class="ic" aria-hidden="true">📒</span><span><b>Klistermærker</b><small>${stickerCount()} af ${STICKERS.length} i bogen</small></span></button></div>`;
   const goalBtns = `<div class="wkgoal"><span class="muted">Dit ugemål:</span>${[2, 3, 4, 5].map(g => `<button data-act="goal" data-g="${g}" aria-pressed="${goal === g}">${g}</button>`).join('')}<span class="muted">dage</span></div>`;
   const map = CH.map(x => { const avg = x.skills.reduce((a, s) => a + stars(s.id), 0) / x.skills.length, cls = x.n === c ? 'now' : x.n > c ? 'later' : ''; return `<button class="chap ${cls}" style="--cc:${CHC[x.n - 1]}" data-act="chap" data-ch="${x.n}"><span class="n">${x.n}</span><span class="t">${x.name}</span>${starRow(Math.floor(avg + 0.001))}<span class="s">${x.n === c ? 'Nu i klassen' : x.n < c ? 'Gennemgået' : 'Kommer ' + chapterWeeks(x.n).split(' – ')[0]}</span></button>`; }).join('');
   const SB = shownBadges(), badges = SB.map(([id, g, nm]) => `<div class="badge ${S.badges[id] ? 'got' : ''}"><div class="medal">${g}</div><span>${nm}</span></div>`).join('');
-  return `${header()}${letter}${newbox}${roundCard}${quick}${searchBox()}
+  return `${header()}${letter}${newbox}${roundCard}${caseCard()}${quick}${searchBox()}
   <section><div class="row" style="justify-content:space-between"><h2>Ugen</h2><span class="muted">${SB.filter(([id]) => S.badges[id]).length} af ${SB.length} mærker</span></div><div class="week">${week}</div>${goalBtns}</section>
   <section><h2>Årets bane</h2><p class="muted">Kontext+ 6 – kapitlerne i den rækkefølge, I har dem i klassen. Tryk på et kapitel for at træne det.</p><div class="map">${map}</div></section>
   <section><h2>Mærker</h2><div class="badges">${badges}</div></section>
@@ -1085,6 +1112,7 @@ function finishRound() {
   (r.newMastered || []).slice(0, 2).forEach(id => give('Styr på ' + SK[id].name.toLowerCase()));
   nb.filter(id => id.startsWith('ch')).forEach(id => give('Kapitelmester'));
   const weak = {}; r.items.forEach(x => { if (x.res !== 'first') weak[x.id] = 1; }); r.weak = Object.keys(weak);
+  if (r.mode === 'daily') { const cur = ensureCase(); r.newClues = cur && cur.id === r.caseBefore ? Math.max(0, cluesOpen(cur) - r.cluesBefore) : (cur ? cluesOpen(cur) : 0); }
   save(); view = 'done'; render(); if (r.first >= n * .75 || nb.length || r.levelUp || r.newStickers.length) burst();
 }
 
@@ -1103,7 +1131,9 @@ function doneView() {
     <div class="stats"><div class="stat"><b>+${r.xp}</b><span>XP · niveau ${L}</span></div><div class="stat"><b>${wc}/${goal}</b><span>${r.weekGoal ? 'ugemålet er nået!' : wc >= goal ? 'ugemål nået – alt ekstra er bonus' : 'dage i denne uge'}</span></div><div class="stat"><b>${ws}</b><span>${ws === 1 ? 'uge' : 'uger'} i træk med ugemål</span></div></div>
     ${r.newStickers && r.newStickers.length ? `<div><h3 style="margin-bottom:10px">${r.newStickers.length === 1 ? 'Nyt klistermærke' : 'Nye klistermærker'} til din bog</h3><div class="newbadges">${r.newStickers.map(i => stickerHTML(i, true)).join('')}</div></div>` : ''}
     ${nb ? `<div><h3 style="margin-bottom:10px">Nye mærker</h3><div class="newbadges">${nb}</div></div>` : ''}
+    ${r.newClues ? `<button class="casecard" data-act="mystery"><span class="ic" aria-hidden="true">🔍</span><span><span class="eyebrow">Kodeklubben</span><b>${r.newClues === 1 ? 'Nyt spor' : r.newClues + ' nye spor'} i ugens sag!</b><small>Åbn sagen og find cifrene til låsen</small></span></button>` : ''}
     <p class="hintbox">${next}</p>
+    ${r.mode === 'daily' ? moodBox() : ''}${r.moodThanks ? '<p class="muted">Tak for dit svar. Det kommer med, når du sender din runde til far.</p>' : ''}
     ${r.weak.length ? `<div><h3>Øv mere på</h3><p class="muted">${r.weak.map(id => SK[id].name).join(' · ')}</p></div>` : ''}
     <div class="row"><button class="btn primary" data-act="home" id="homebtn">Til forsiden</button><button class="btn" data-act="practice">Vælg selv emne</button>${r.newStickers && r.newStickers.length ? '<button class="btn ghost" data-act="stickers">Se din bog</button>' : ''}</div></div>`;
 }
@@ -1129,6 +1159,94 @@ function sendView() {
   <textarea id="code" readonly aria-label="Din statuskode">Laver koden …</textarea>
   <div class="row"><button class="btn primary" data-act="copy">Kopiér kode</button><span class="muted" style="font-size:.9rem">Koden er også en backup. Mister du dine data, kan far gendanne dem med den.</span></div></section>`;
 }
+
+/* ---------- v3: Kodeklubben – ugens mysterie ---------- */
+// Each case: 4 clues. Each clue has a short story text and a small maths task whose answer is one digit of the padlock code.
+// Tasks only use chapters 1-3 (already taught) so they double as spaced review.
+const CLUB = 'Kodeklubben holder til i Skuret bag skolens cykelparkering. Maja styrer notesbogen, Oskar bygger gadgets, Ali laver jokes og har hunden Pixel – og du er klubbens kodeknækker.';
+const MYST = [
+ { id: 'pokal', title: 'Den forsvundne pokal',
+   intro: 'Skolens håndboldpokal er væk fra vitrineskabet – tre timer før finalen! Inspektøren er i panik, og Ali er allerede i gang med at mistænke kantinedamen. Kodeklubben tager sagen.',
+   clues: [
+     { t: 'Maja finder en kvittering på gulvet foran vitrinen. Én pudseklud fra Sport & Glans, købt i går.', q: 'Pudseklude koster 20 kr. Der er <b>25 % rabat</b>. Hvor mange kroner er rabatten?', a: 5, h: '25 % er det samme som en fjerdedel.', x: '20 : 4 = 5 kr.' },
+     { t: 'Oskar måler et fodspor med sin laser-lineal. Der er hvidt sand i aftrykket – den slags sand findes kun i idrætshallen.', q: 'Aftrykket er <b>0,28 m</b> langt. Hvilket ciffer står på <b>hundrededelspladsen</b>?', a: 8, h: 'Første ciffer efter kommaet er tiendedele, det næste er hundrededele.', x: 'I 0,28 er 2 tiendedele og 8 hundrededele.' },
+     { t: 'Dørens nøglekort-log viser, at gangen blev åbnet kl. 7.42 – af kort nummer √16. Pixel gør højt.', q: 'Hvilket nummer har kortet? Udregn <b>√16</b>.', a: 4, h: 'Hvilket tal gange sig selv giver 16?', x: '4 · 4 = 16, så √16 = 4.' },
+     { t: 'Under bænken ligger en seddel med store, runde bogstaver: "Pokalen SKAL skinne til finalen!"', q: 'Der var <b>−2 °C</b> i hallen kl. 7, og temperaturen steg <b>5 grader</b>. Hvor mange grader var der så?', a: 3, h: 'Start ved −2 på tallinjen og gå 5 til højre.', x: '−2 + 5 = 3 grader.' }],
+   ask: 'Hvad skete der med pokalen?', opts: ['Træner Lone hentede den tidligt for at pudse den', 'Pedellen smed den ud ved en fejl', 'Et andet hold stjal den før finalen'], ok: 0,
+   nudge: 'Kig på kortnummeret og på hvem der køber pudseklude.',
+   sol: 'Kort nr. 4 tilhører træner Lone. Hun hentede pokalen kl. 7.42, købte en pudseklud og pudsede den i hallen – deraf sandet. Hun glemte bare at sige det. Pokalen står og skinner ved banen. Ali: "Så sagen var … ren pudsning."' },
+ { id: 'juice', title: 'Juicebarens hemmelige opskrift',
+   intro: 'Jonas fra Juicebaren har opfundet en ny smoothie. Opskriften lå på disken – nu er den væk, og der mangler et hjørne af papiret. Alle kigger mistænkeligt på Smoothie-Sara fra boden overfor.',
+   clues: [
+     { t: 'Det afrevne hjørne ligger i skraldespanden BAG disken – ikke ude ved kunderne.', q: 'Opskriften fyldte <b>3/4</b> af papiret. Skriv 3/4 som decimaltal. Hvilket ciffer står på <b>hundrededelspladsen</b>?', a: 5, h: '3/4 = 75/100.', x: '3/4 = 0,75. Hundrededelscifferet er 5.' },
+     { t: 'Kassebonen viser, at praktikanten Emil solgte en "mystery-smoothie" kl. 15. Den står ikke på menuen.', q: 'Mystery-smoothien kostede 40 kr. Hvad er <b>10 %</b> af 40 kr.?', a: 4, h: '10 % får du ved at dele med 10.', x: '40 : 10 = 4 kr.' },
+     { t: 'Blenderens timer står stadig på den hemmelige indstilling. Kun Jonas og Emil kender den.', q: 'Timeren viser <b>2³</b> sekunder. Hvor mange sekunder er det?', a: 8, h: '2³ betyder 2 · 2 · 2.', x: '2 · 2 · 2 = 8 sekunder.' },
+     { t: 'Oskar tjekker Saras køledisk. Den har været tændt og åben hele dagen – hun har ikke forladt sin bod et sekund.', q: 'Saras køledisk viser <b>−4 °C</b>. Hun skruer <b>6 grader</b> op. Hvad viser den nu?', a: 2, h: 'Fra −4 op til 0 er 4 grader. Hvor mange er der tilbage?', x: '−4 + 6 = 2 grader.' }],
+   ask: 'Hvem tog opskriften?', opts: ['Praktikanten Emil – han ville overraske Jonas', 'Smoothie-Sara fra boden overfor', 'Jonas selv – han havde glemt det'], ok: 0,
+   nudge: 'Hvem kender den hemmelige blendertid, og hvem solgte noget, der ikke står på menuen?',
+   sol: 'Emil lånte opskriften for at lave en prøve-smoothie som overraskelse til Jonas – og rev hjørnet af ved et uheld. Sara var uskyldig hele tiden. Smoothien hedder nu "Kodeklubbens Kriminelt Gode".' },
+ { id: 'stald', title: 'Spøgelset på rideskolen',
+   intro: 'På rideskolen tænder staldlampen midt om natten, og halmballerne flytter sig. Staldpigerne tør ikke gå derned efter mørkets frembrud. Ali har taget hvidløg med. "Til en sikkerheds skyld."',
+   clues: [
+     { t: 'Der er hovspor hele vejen rundt langs den runde ridebane – men ingen menneskespor.', q: 'Ridebanen er en cirkel med diameter <b>20 m</b>. Omkredsen er π · 20 = 62,8 m. Hvilket ciffer står på <b>tiendedelspladsen</b>?', a: 8, h: 'Tiendedelspladsen er lige efter kommaet.', x: '3,14 · 20 = 62,8. Tiendedelscifferet er 8.' },
+     { t: 'Halmballerne er ikke båret væk. De er halvt spist op.', q: 'Der var <b>12</b> baller. <b>1/4</b> af dem er spist. Hvor mange baller er spist?', a: 3, h: 'Find en fjerdedel ved at dele med 4.', x: '12 : 4 = 3 baller.' },
+     { t: 'Lampen tænder ved bevægelse. Sensoren sidder lavt – lige i højde med en ponys mule.', q: 'Lampen tændte <b>√36</b> gange i nat. Hvor mange gange er det?', a: 6, h: 'Hvilket tal gange sig selv giver 36?', x: '6 · 6 = 36, så √36 = 6.' },
+     { t: 'Låsen på boksdøren er en simpel krog. Der er savl på den. Meget savl.', q: 'Udregn <b>−5 + 9</b>.', a: 4, h: 'Start ved −5 og gå 9 skridt til højre.', x: '−5 + 9 = 4.' }],
+   ask: 'Hvem er "spøgelset"?', opts: ['Ponyen Pjuske – hun åbner selv krogen', 'Staldkarlen Mads, der arbejder om natten', 'Et rigtigt spøgelse'], ok: 0,
+   nudge: 'Hvem efterlader hovspor, spiser halm og savler?',
+   sol: 'Ponyen Pjuske har lært at løfte krogen med mulen. Hun går natlige ture, spiser halm og tænder lampen, når hun går forbi sensoren. Maja skriver i notesbogen: "Gerningsmand: Pjuske, 11 år, mistænkeligt sød." Ali beholder hvidløget.' },
+ { id: 'kasse', title: 'Klassekassens mystiske minus',
+   intro: 'Efter klassefesten viser klassekassen pludselig −150 kr. Kassereren Freja er ved at græde, og nogen hvisker, at hun har brugt pengene. Kodeklubben kræver at se bonerne.',
+   clues: [
+     { t: 'På bonen fra slikbutikken står "Kæmpepose slik, 150 kr." – to gange.', q: 'En pose slik koster 25 kr. Hvad er <b>20 %</b> af 25 kr.?', a: 5, h: '20 % er det samme som 1/5. Del med 5.', x: '25 : 5 = 5 kr.' },
+     { t: 'Freja har skrevet alt ind præcis som på bonen. Hendes regnskab er pænt og rigtigt – hun har bare kopieret en forkert bon.', q: 'Skriv <b>0,07</b> som procent. Hvor mange procent er det?', a: 7, h: 'Procent betyder hundrededele.', x: '0,07 = 7 hundrededele = 7 %.' },
+     { t: 'Butikken fik nyt kasseapparat samme dag. Ekspedienten øvede sig stadig.', q: 'Overslag: 98 · 3 er cirka 300. Hvad er <b>300 : 100</b>?', a: 3, h: 'At dele med 100 flytter kommaet to pladser til venstre.', x: '300 : 100 = 3.' },
+     { t: 'Maja regner efter: Hvis den ene kæmpepose tages ud igen, passer alt.', q: 'Udregn <b>−150 + 150</b>.', a: 0, h: 'Hvad sker der, når man lægger det samme tal til, som man har trukket fra?', x: '−150 + 150 = 0.' }],
+   ask: 'Hvorfor står kassen i minus?', opts: ['Butikken scannede kæmpeposen to gange', 'Freja har brugt pengene', 'Nogen i klassen har brugt kortet'], ok: 0,
+   nudge: 'Kig på bonen fra slikbutikken og på, hvad der skete med kasseapparatet.',
+   sol: 'Det nye kasseapparat scannede kæmpeposen to gange. Butikken betaler de 150 kr. tilbage og giver en ekstra pose for besværet. Kassen står i præcis 0 – og Freja er renset. Ali: "Minus gange minus giver plus … slik."' },
+ { id: 'kridt', title: 'Tallene i cykelkælderen',
+   intro: 'Nogen har skrevet mærkelige tal med blå kridtspray på væggen i cykelkælderen: "22/7 – 3,14 – 9". Inspektøren kalder det hærværk. Oskar kalder det en kode.',
+   clues: [
+     { t: '22 divideret med 7 er næsten præcis π. Den, der skrev det, kan sin matematik.', q: 'π er cirka <b>3,14</b>. Hvilket ciffer står på <b>hundrededelspladsen</b>?', a: 4, h: 'Andet ciffer efter kommaet.', x: 'I 3,14 er 1 tiendedel og 4 hundrededele.' },
+     { t: 'Kridtsprayen kan vaskes af. Den slags spray står i formningslokalet – kun lærerne har nøgle.', q: 'En cirkel har radius <b>3</b>. Hvor lang er diameteren?', a: 6, h: 'Diameteren er dobbelt så lang som radius.', x: '2 · 3 = 6.' },
+     { t: 'Rundt om cykelstativet er tegnet en perfekt cirkel – med en snor, der har en knude for hver meter, som dem i matematiklokalet.', q: 'Omkredsen af en cirkel med diameter 2 er π · 2 = 6,28. Hvilket ciffer står på <b>tiendedelspladsen</b>?', a: 2, h: 'Første ciffer efter kommaet.', x: 'I 6,28 er tiendedelscifferet 2.' },
+     { t: 'En lille pil peger op ad trappen mod "Lokale 9".', q: 'Hvilket lokale? Udregn <b>√81</b>.', a: 9, h: 'Hvilket tal gange sig selv giver 81?', x: '9 · 9 = 81, så √81 = 9.' }],
+   ask: 'Hvem skrev tallene?', opts: ['Matematiklæreren – det er en skattejagt til π-dagen', 'Nogle elever fra 9.b', 'En gadekunstner udefra'], ok: 0,
+   nudge: 'Hvem har nøgle til formningslokalet og knudesnore fra matematiklokalet?',
+   sol: 'Matematiklæreren Hanne har lavet en skattejagt. I lokale 9 står en kasse med en kage formet som π. Kodeklubben fandt den først. Oskar: "Det er første gang, jeg har spist en sag."' },
+ { id: 'jul', title: 'Pakkekalenderens tomme låge',
+   intro: 'Klassens pakkekalender er åbnet til den 6. december – men låge 6 er tom! Hele klassen kigger på hinanden. Ali påstår, at det var en nisse. Maja tror ikke på nisser. Maja tror på beviser.',
+   clues: [
+     { t: 'Låge 6 er tom, men låge 9 er tungere end alle de andre låger.', q: 'Udregn <b>2 + 2²</b>.', a: 6, h: 'Potens først: 2² = 4.', x: '2 + 4 = 6.' },
+     { t: 'Tallene på lågerne er skrevet med sort tusch – uden streg under 6 og 9.', q: 'Udregn <b>3²</b>.', a: 9, h: '3² betyder 3 · 3.', x: '3 · 3 = 9.' },
+     { t: 'Pedellen fortæller, at kalenderen hang på hovedet i går. Han vendte den om i morges.', q: 'Forkort <b>4/8</b> mest muligt. Hvad bliver <b>nævneren</b>?', a: 2, h: 'Del både tæller og nævner med 4.', x: '4/8 = 1/2. Nævneren er 2.' },
+     { t: 'Oskar kigger ind i låge 9 med sin lommelygte. Der ligger to pakker. På den ene står "Låge 6".', q: 'Hvilket ciffer står på <b>tiendedelspladsen</b> i <b>0,1</b>?', a: 1, h: 'Tiendedelspladsen er lige efter kommaet.', x: 'I 0,1 er tiendedelscifferet 1.' }],
+   ask: 'Hvad skete der med låge 6?', opts: ['Kalenderen hang på hovedet, så 6 og 9 byttede plads', 'Nogen åbnede låge 6 og spiste pakken', 'Læreren glemte at fylde låge 6'], ok: 0,
+   nudge: 'Hvad sker der med tallet 6, når man vender det på hovedet?',
+   sol: 'Da kalenderen hang på hovedet, lignede 6 et 9-tal. Pakken til den 6. kom derfor i låge 9. Ingen nisse, ingen tyv – bare en kalender på hovedet. Ali: "Sagen var simpelthen … vendt på hovedet." God jul fra Kodeklubben.' },
+];
+const MYSTN = id => MYST.findIndex(c => c.id === id);
+function ensureCase() { // returns current case object or null
+  const M = S.myst;
+  if (M.cur && MYSTN(M.cur.id) >= 0) return M.cur;
+  if (M.lastSolvedWeek && M.lastSolvedWeek === mondayOf(today())) return null; // new case on Monday
+  const next = MYST.find(c => !M.solved[c.id]); if (!next) return null;
+  M.cur = { id: next.id, start: today(), clues: {}, tries: 0 }; save(); return M.cur;
+}
+function roundsSince(k) { return Object.keys(S.days).filter(d => d >= k && S.days[d].r).length; }
+function cluesOpen(cur) { if (!cur) return 0; return Math.min(4, Math.ceil(4 * roundsSince(cur.start) / Math.max(1, S.wk.goal))); }
+function caseState() { // for cards
+  const cur = ensureCase();
+  if (cur) { const c = MYST[MYSTN(cur.id)], open = cluesOpen(cur), solved = Object.values(cur.clues).filter(x => x.ok).length; return { kind: 'open', c, cur, open, solved }; }
+  if (MYST.every(c => S.myst.solved[c.id])) return { kind: 'all' };
+  return { kind: 'wait' };
+}
+const solvedCount = () => Object.keys(S.myst.solved).length;
+
+/* ---------- v3: ugens humør ---------- */
+const MOODS = [['god', '😀', 'God'], ['fin', '🙂', 'Fin'], ['kedelig', '😕', 'Kedelig']];
+const moodAsk = () => { const mk = mondayOf(today()); return !S.mood[mk] && weekCount(mk) >= Math.min(2, S.wk.goal); };
 
 /* ---------- v2 views: themes + sticker book ---------- */
 let draft = null; // custom theme being edited
@@ -1159,6 +1277,56 @@ function stickerView() {
   <div class="sbook">${all}</div></section>`;
 }
 
+/* ---------- v3 views: case file + archive ---------- */
+let mystMsg = {}; // per-clue feedback during this visit
+let readCase = null; // archive: which solved case to show
+function mysteryView() {
+  if (readCase) { const c = MYST[MYSTN(readCase)]; return `<div class="row"><button class="btn ghost small" data-act="archive">‹ Sagsmappen</button></div>
+    <div class="casefile"><span class="eyebrow">Kodeklubben · Lukket sag</span><h1>${c.title}</h1><p>${c.intro}</p>${c.clues.map((k, i) => `<div class="clue done"><span class="eyebrow">Spor ${i + 1}</span><p>${k.t}</p></div>`).join('')}<div class="solved"><span class="stamp">Sag lukket</span><p>${c.sol}</p></div></div>`; }
+  const st = caseState(), back = `<div class="row"><button class="btn ghost small" data-act="home">‹ Tilbage</button>${solvedCount() ? '<button class="btn ghost small" data-act="archive">Sagsmappen</button>' : ''}</div>`;
+  const just = S.myst.just ? MYST[MYSTN(S.myst.just)] : null;
+  if (just) return `${back}<div class="casefile"><span class="eyebrow">Kodeklubben · Sag opklaret</span><h1>${just.title}</h1><div class="solved"><span class="stamp">Sag lukket</span><p>${just.sol}</p></div><p class="muted">${st.kind === 'all' ? 'Du har opklaret alle sagerne. Nye sager er på vej.' : 'Kodeklubben får en ny sag på mandag.'}</p><div class="row"><button class="btn primary" data-act="justok">Læg sagen i mappen</button></div></div>`;
+  if (st.kind === 'all') return `${back}<div class="casefile"><h1>Alle sager er opklaret</h1><p>Kodeklubben venter på nye sager. Far er sat på sagen.</p></div>`;
+  if (st.kind === 'wait') return `${back}<div class="casefile"><h1>Ingen sag lige nu</h1><p>Du har opklaret ugens sag. Kodeklubben får en ny sag på mandag.</p></div>`;
+  const { c, cur, open } = st, nm = esc(S.name || 'du');
+  const clues = c.clues.map((k, i) => {
+    const s = cur.clues[i] || {}, msg = mystMsg[i];
+    if (i >= open) return `<div class="clue locked"><span class="eyebrow">Spor ${i + 1}</span><p class="muted">Låst. Tag dagens runde for at låse flere spor op.</p></div>`;
+    const body = s.ok
+      ? `<p class="digit-line">Cifret er <span class="digit">${k.a}</span>${s.shown ? ` <span class="muted">· ${k.x}</span>` : ''}</p>`
+      : `<p class="task">${k.q}</p><form class="ans clueform" data-i="${i}" autocomplete="off"><label class="inwrap ${msg ? 'bad' : ''}"><input id="clue${i}" inputmode="decimal" aria-label="Svar på spor ${i + 1}"></label><button class="btn primary small" type="submit">Tjek</button></form>${msg ? `<div class="hintbox">${msg}</div>` : ''}`;
+    return `<div class="clue ${s.ok ? 'done' : ''}"><span class="eyebrow">Spor ${i + 1}</span><p>${k.t}</p>${body}</div>`;
+  }).join('');
+  const digits = c.clues.map((k, i) => `<span class="lockd ${cur.clues[i] && cur.clues[i].ok ? 'on' : ''}">${cur.clues[i] && cur.clues[i].ok ? k.a : '?'}</span>`).join('');
+  const all = c.clues.every((k, i) => cur.clues[i] && cur.clues[i].ok);
+  const final = all ? `<div class="final"><h3>Låsen klikker op. ${c.ask}</h3><div class="choices">${c.opts.map((o, i) => `<button class="choice" data-act="accuse" data-i="${i}" ${(cur.wrong || []).includes(i) ? 'disabled' : ''}><span class="k">${'ABC'[i]}</span><span>${o}</span></button>`).join('')}</div>${cur.wrong && cur.wrong.length ? `<div class="hintbox">Ikke helt. ${c.nudge}</div>` : ''}</div>` : '';
+  return `${back}<div class="casefile"><span class="eyebrow">Kodeklubben · Sag ${MYSTN(c.id) + 1} af ${MYST.length}</span><h1>${c.title}</h1>
+    ${MYSTN(c.id) === 0 && !Object.keys(cur.clues).length ? `<p class="muted">${CLUB.replace('du er', nm === 'du' ? 'du er' : nm + ', du er')}</p>` : ''}
+    <p>${c.intro}</p>
+    <div class="lock" aria-label="Hængelås med fire cifre"><span class="lockic" aria-hidden="true">${all ? '🔓' : '🔒'}</span>${digits}</div>
+    ${open === 0 ? '<p class="hintbox">Tag dagens runde for at låse det første spor op. Når du når dit ugemål, er alle spor åbne.</p>' : ''}
+    ${clues}${final}</div>`;
+}
+function archiveView() {
+  const done = MYST.filter(c => S.myst.solved[c.id]);
+  return `<div class="row"><button class="btn ghost small" data-act="mystery">‹ Ugens sag</button></div><section><span class="eyebrow">Kodeklubben</span><h1>Sagsmappen</h1><p class="muted">${done.length} af ${MYST.length} sager opklaret.</p>
+    ${done.length ? done.map(c => `<button class="qbtn" data-act="readcase" data-id="${c.id}"><span class="ic" aria-hidden="true">📁</span><span><b>${c.title}</b><small>Opklaret ${parse(S.myst.solved[c.id]).toLocaleDateString('da-DK', { day: 'numeric', month: 'long' })}</small></span></button>`).join('') : '<p>Ingen lukkede sager endnu.</p>'}</section>`;
+}
+function caseCard() {
+  if (!S.name) return '';
+  const st = caseState();
+  if (st.kind === 'open') { const { c, open, solved } = st; return `<button class="casecard" data-act="mystery"><span class="ic" aria-hidden="true">🔍</span><span><span class="eyebrow">Kodeklubben · Ugens sag</span><b>${c.title}</b><small>${open === 0 ? 'Tag dagens runde for at låse første spor op' : `${open} af 4 spor åbne · ${solved} cifre fundet`}</small></span></button>`; }
+  if (st.kind === 'wait') return `<button class="casecard" data-act="mystery"><span class="ic" aria-hidden="true">📁</span><span><span class="eyebrow">Kodeklubben</span><b>Sag lukket!</b><small>Ny sag på mandag · ${solvedCount()} af ${MYST.length} opklaret</small></span></button>`;
+  return `<button class="casecard" data-act="archive"><span class="ic" aria-hidden="true">🏅</span><span><span class="eyebrow">Kodeklubben</span><b>Alle sager opklaret</b><small>Se sagsmappen</small></span></button>`;
+}
+function moodBox() {
+  if (!moodAsk()) return '';
+  return `<div class="moodbox"><h3>Hvordan var ugen i Talbanen?</h3><p class="muted" style="font-size:.9rem">Valgfrit. Dit svar kommer med, når du sender din runde til far.</p>
+    <div class="row">${MOODS.map(([v, e, n]) => `<button class="btn" data-act="mood" data-v="${v}"><span aria-hidden="true">${e}</span> ${n}</button>`).join('')}</div>
+    <label class="inwrap" style="max-width:none;flex:none;min-height:48px"><input id="moodtxt" maxlength="120" placeholder="Vil du sige noget mere? (valgfrit)" style="font-family:var(--body);font-weight:400;font-size:1rem"></label>
+    <button class="btn ghost small" data-act="mood" data-v="skip" style="align-self:flex-start">Spring over</button></div>`;
+}
+
 /* ---------- parent ---------- */
 function statusOf(id) {
   const s = S.skills[id]; if (!s || !s.n) return ['none', 'Ikke øvet'];
@@ -1185,11 +1353,19 @@ function parentView() {
     const talk = `<div class="talk">
       <div class="item"><h3>Start med det, der går godt</h3><p>${weekStreak() >= 1 ? `Hun har nået sit ugemål ${weekStreak()} ${weekStreak() === 1 ? 'uge' : 'uger'} i træk. ` : ''}${strong.length ? `Hun er sikrest i <b>${strong.map(id => SK[id].name.toLowerCase()).join('</b> og <b>')}</b>.` : 'Når hun har taget et par runder, kan du se her, hvad hun er stærkest i.'}</p></div>
       <div class="item warn"><h3>Løs en opgave sammen</h3><p class="muted">Lad hende forklare, hvordan hun tænker, før I ser svaret.</p>${weak.map(id => `<div class="together" data-sk="${id}"><span class="eyebrow">${SK[id].name} · Kap. ${SK[id].ch}</span><div class="slot"></div><div class="row"><button class="btn small" data-act="tq" data-sk="${id}">Ny opgave</button><button class="btn small ghost" data-act="ta">Vis svar</button></div><div class="sol" hidden></div></div>`).join('')}</div>
-      <div class="item"><h3>Spørg hende</h3><p>Hvad laver I i matematik lige nu? Hvad var det sværeste i denne uge? Hvilken opgave i dag var du mest stolt af?</p></div></div>`;
+      ${(() => { const m = S.mood[mondayOf(t)] || S.mood[addDays(mondayOf(t), -7)]; return m && m.v === 'kedelig' ? `<div class="item warn"><h3>Hun syntes, ugen var kedelig</h3><p>${m.c ? `Hun skrev: "${esc(m.c)}". ` : ''}Spørg nysgerrigt, hvad der skulle være anderledes – uden at forsvare Talbanen.</p></div>` : ''; })()}
+      <div class="item"><h3>Spørg hende</h3><p>${solvedCount() ? 'Hvilken Kodeklub-sag var sjovest? ' : ''}Hvad laver I i matematik lige nu? Hvad var det sværeste i denne uge? Hvilken opgave i dag var du mest stolt af?</p></div></div>`;
     const r28 = S.rounds.filter(r => r.m === 'daily' && daysBetween(r.d, t) < 28), viaL = r28.filter(r => r.l).length;
     body = `<div class="kv"><div class="stat"><b>${weekCount(mondayOf(t))}/${S.wk.goal}</b><span>dage denne uge (ugemål) · ${weekStreak()} ${weekStreak() === 1 ? 'uge' : 'uger'} i træk</span></div><div class="stat"><b>${q7 ? Math.round(f7 / q7 * 100) : '–'}${q7 ? ' %' : ''}</b><span>rigtige i første forsøg</span></div><div class="stat"><b>${avgMin || '–'}${avgMin ? ' min' : ''}</b><span>pr. runde i snit</span></div><div class="stat"><b>${levelOf(S.xp)}</b><span>niveau · ${S.xp} XP</span></div></div>
       <section><h2>Sidste 4 uger</h2><div class="cal" aria-label="Kalender over dage med runde">${cal}</div><p class="muted" style="font-size:.85rem">Orange: dagens runde klaret. Gul: kun fri træning. Ma–Sø fra venstre. ${roundsWeek} dage med runde de sidste 7 dage.</p>
         <p class="muted" style="font-size:.85rem">Sidste 4 uger: ${r28.length} runder, heraf ${viaL} startet lige efter en besked fra dig. Resten åbnede hun selv. ${stickerCount()} klistermærker i bogen.</p></section>
+      <section><h2>Hendes uger</h2>${(() => {
+        const cm = mondayOf(t), rows = Array.from({ length: 6 }, (_, i) => addDays(cm, -7 * i)).map(mk => {
+          const m = S.mood[mk], md = m && MOODS.find(x => x[0] === m.v);
+          return `<tr><td class="n">${parse(mk).toLocaleDateString('da-DK', { day: 'numeric', month: 'short' })}</td><td class="n">${weekCount(mk)}/${S.wk.met[mk] || S.wk.goal}${weekMet(mk) ? ' ✓' : ''}</td><td>${md ? `${md[1]} ${md[2]}` : m && m.v === 'skip' ? '<span class="muted">sprang over</span>' : '<span class="muted">–</span>'}</td><td>${m && m.c ? esc(m.c) : ''}</td></tr>`; }).join('');
+        return `<div class="tbl-wrap"><table><thead><tr><th>Uge</th><th>Dage/mål</th><th>Hvordan var ugen</th><th>Hendes ord</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+      })()}
+      <p class="muted" style="font-size:.85rem">Kodeklubben: ${solvedCount()} af ${MYST.length} sager opklaret${S.myst.cur ? ` · i gang med "${MYST[MYSTN(S.myst.cur.id)].title}" (${Object.values(S.myst.cur.clues).filter(x => x.ok).length}/4 cifre)` : ''}.</p></section>
       <section><h2>Til jeres snak</h2>${talk}</section>`;
   } else if (parentTab === 'besked') {
     const isFile = location.protocol === 'file:';
@@ -1233,13 +1409,24 @@ function render() {
   else if (view === 'parent') { app.innerHTML = parentView(); app.querySelectorAll('.together').forEach(fillTogether); }
   else if (view === 'theme') app.innerHTML = themeView();
   else if (view === 'stickers') app.innerHTML = stickerView();
+  else if (view === 'mystery') app.innerHTML = mysteryView();
+  else if (view === 'archive') app.innerHTML = archiveView();
   if (document.getElementById('searchres') && lastQ) showSearch(lastQ);
   if (view === 'quiz') { const it = R0.items[R0.i]; if (it.final) document.getElementById('nextbtn')?.focus(); else document.getElementById('numin')?.focus(); }
 }
 function go(v) { view = v; resetArm = false; render(); window.scrollTo(0, 0); }
+function clueAnswer(i) {
+  const cur = S.myst.cur; if (!cur) return; const c = MYST[MYSTN(cur.id)], k = c.clues[i], inp = document.getElementById('clue' + i), v = inp ? inp.value : '';
+  if (isNaN(parseNum(v))) { toast('Skriv et tal'); return; }
+  const s = cur.clues[i] || (cur.clues[i] = { t: 0 });
+  if (Math.abs(parseNum(v) - k.a) < 1e-9) { s.ok = 1; delete mystMsg[i]; toast('Rigtigt! Nyt ciffer til låsen'); }
+  else { s.t = (s.t || 0) + 1; if (s.t >= 2) { s.ok = 1; s.shown = 1; delete mystMsg[i]; toast('Her er løsningen – cifret er dit'); } else mystMsg[i] = 'Ikke helt. ' + k.h; }
+  save(); const y = window.scrollY; render(); window.scrollTo(0, y);
+  if (c.clues.every((_, j) => cur.clues[j] && cur.clues[j].ok) && s.ok) burst();
+}
 function startRound(mode, ids) { R0 = makeRound(mode, ids); go('quiz'); }
 
-app.addEventListener('submit', e => { if (e.target.id === 'searchform') { e.preventDefault(); const v = document.getElementById('searchin').value; showSearch(v); logSearch(v); return; } if (e.target.id === 'nameform') { e.preventDefault(); const v = document.getElementById('namein').value.trim(); if (v) { S.name = v.slice(0, 24); save(); render(); } return; } if (e.target.id === 'numform') { e.preventDefault(); submit(document.getElementById('numin').value); } });
+app.addEventListener('submit', e => { if (e.target.classList.contains('clueform')) { e.preventDefault(); clueAnswer(Number(e.target.dataset.i)); return; } if (e.target.id === 'searchform') { e.preventDefault(); const v = document.getElementById('searchin').value; showSearch(v); logSearch(v); return; } if (e.target.id === 'nameform') { e.preventDefault(); const v = document.getElementById('namein').value.trim(); if (v) { S.name = v.slice(0, 24); save(); render(); } return; } if (e.target.id === 'numform') { e.preventDefault(); submit(document.getElementById('numin').value); } });
 app.addEventListener('change', e => {
   if (e.target.id === 'chsel') { S.settings.chapter = e.target.value; save(); toast('Kapitel gemt'); render(); }
   if (e.target.id === 'lensel') { S.settings.len = Number(e.target.value); save(); toast('Længde gemt'); }
@@ -1276,7 +1463,21 @@ app.addEventListener('click', async e => {
   else if (a === 'unreset') { resetArm = false; render(); }
   else if (a === 'goal') { setGoal(Number(b.dataset.g)); save(); toast(`Ugemål: ${b.dataset.g} dage`); render(); }
   else if (a === 'readletter') { const L = (S.letters || []).find(x => !x.read); if (L) { L.read = today(); save(); } render(); }
-  else if (a === 'v2ok') { S.v2 = today(); save(); render(); }
+  else if (a === 'v2ok') { S.v2 = S.v2 || today(); S.v3 = today(); save(); render(); }
+  else if (a === 'openclub') { S.v2 = S.v2 || today(); S.v3 = today(); save(); mystMsg = {}; readCase = null; go('mystery'); }
+  else if (a === 'mystery') { mystMsg = {}; readCase = null; go('mystery'); }
+  else if (a === 'archive') { readCase = null; go('archive'); }
+  else if (a === 'readcase') { readCase = b.dataset.id; go('mystery'); }
+  else if (a === 'justok') { S.myst.just = null; save(); go('home'); }
+  else if (a === 'accuse') {
+    const cur = S.myst.cur; if (!cur) return; const c = MYST[MYSTN(cur.id)], i = Number(b.dataset.i);
+    if (i === c.ok) {
+      const t = today(); S.myst.solved[cur.id] = t; S.myst.lastSolvedWeek = mondayOf(t); S.myst.just = cur.id; S.myst.cur = null;
+      const nb = []; checkBadges(nb); const si = giveSticker('Opklarede ' + c.title.toLowerCase()); save(); go('mystery'); burst();
+      toast(si !== null ? `Sag lukket! Nyt klistermærke: ${STICKERS[si][1]}` : 'Sag lukket!');
+    } else { cur.wrong = (cur.wrong || []).concat(i); cur.tries = (cur.tries || 0) + 1; save(); const y = window.scrollY; render(); window.scrollTo(0, y); }
+  }
+  else if (a === 'mood') { const mk = mondayOf(today()), txt = (document.getElementById('moodtxt') || {}).value || ''; S.mood[mk] = { v: b.dataset.v, c: b.dataset.v === 'skip' ? '' : txt.trim().slice(0, 120), d: today() }; if (R0) R0.moodThanks = b.dataset.v !== 'skip'; save(); render(); }
   else if (a === 'theme') { if (!S.v2) { S.v2 = today(); save(); } draft = null; go('theme'); }
   else if (a === 'stickers') go('stickers');
   else if (a === 'pickth') { const th = b.dataset.th; S.look = { theme: th, custom: draft || S.look.custom }; draft = null; save(); applyLook(); render(); toast('Tema gemt'); }
@@ -1297,6 +1498,8 @@ function fixup() {
   if (!S.look || typeof S.look !== 'object') S.look = d.look; if (!S.look.custom) S.look.custom = d.look.custom;
   ['stickers', 'mastered'].forEach(k => { if (!S[k] || typeof S[k] !== 'object') S[k] = {}; });
   if (!Array.isArray(S.letters)) S.letters = [];
+  if (!S.myst || typeof S.myst !== 'object') S.myst = d.myst; if (!S.myst.solved) S.myst.solved = {};
+  if (!S.mood || typeof S.mood !== 'object') S.mood = {};
   if (!S.v2mig) { // one-time upgrade from version 1: honour skills she already masters + a welcome sticker
     Object.keys(S.skills).forEach(id => { if (SK[id] && S.skills[id].box >= 3 && !S.mastered[id]) { S.mastered[id] = S.skills[id].last || today(); if (stickerCount() < 4) giveSticker('Styr på ' + SK[id].name.toLowerCase()); } });
     giveSticker('Velkommen til den nye Talbane');
@@ -1308,7 +1511,7 @@ applyLook();
 handleHash();
 window.addEventListener('hashchange', () => { if (handleHash()) { view = 'home'; render(); } });
 render();
-window.__talbane = { CH, SK, parseNum, isRight, searchSkills, makeLetter, readLetter, weekStreak, levelOf };
+window.__talbane = { CH, SK, parseNum, isRight, searchSkills, makeLetter, readLetter, weekStreak, levelOf, MYST };
 })();
 </script>
 
