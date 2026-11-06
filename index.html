@@ -40,9 +40,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--pen);outline-offset:2px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:2px solid var(--ink);background:var(--card);border-radius:999px;padding:10px 20px;font-weight:700;min-height:46px}
 .btn:hover{background:var(--pen-soft)}
-.btn.primary{background:var(--pen);border-color:var(--pen);color:#fff}
-:root[data-theme="dark"] .btn.primary{color:#0d1322}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#0d1322}}
+.btn.primary{background:var(--pen);border-color:var(--pen);color:var(--on-pen,#fff)}
+:root[data-theme="dark"] .btn.primary{color:var(--on-pen,#0d1322)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:var(--on-pen,#0d1322)}}
 .btn.primary:hover{filter:brightness(1.08)}
 .btn.ghost{border-color:transparent;background:transparent;padding-inline:10px}
 .btn.ghost:hover{background:var(--pen-soft)}
@@ -215,6 +215,49 @@ button.tag{cursor:pointer;min-height:34px}
 button.tag:hover{border-color:var(--pen);color:var(--pen)}
 .sres{display:flex;flex-direction:column;gap:10px}
 .sres .panel{padding:14px 16px}
+/* v2: patterns, colour, stickers, letters, themes */
+:root[data-pattern="dots"] body{background-image:radial-gradient(var(--grid) 2.2px,transparent 2.8px);background-size:22px 22px;background-position:0 0}
+:root[data-pattern="none"] body{background-image:none}
+:root[data-pattern="stripes"] body{background-image:repeating-linear-gradient(135deg,var(--grid) 0 10px,transparent 10px 26px);background-size:auto}
+.chap{border-top:6px solid var(--cc,var(--line))}
+.qcard{border-top:8px solid var(--cc,var(--ink))}
+.quick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.qbtn{display:flex;align-items:center;gap:12px;text-align:left;background:var(--card);border:2px solid var(--ink);border-radius:var(--r);padding:12px 14px;box-shadow:3px 3px 0 var(--shadow);min-height:64px}
+.qbtn:hover{background:var(--pen-soft)}
+.qbtn .ic{font-size:1.8rem;line-height:1}
+.qbtn b{display:block;font-family:var(--display)}
+.qbtn small{color:var(--muted)}
+.wkgoal{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.wkgoal button{min-width:44px;min-height:38px;border-radius:999px;border:2px solid var(--line);background:var(--card);font-weight:700}
+.wkgoal button[aria-pressed="true"]{background:var(--pen);border-color:var(--pen);color:var(--on-pen,#fff)}
+.streak .wk{display:block;color:var(--muted);font-size:.74rem;margin-top:2px}
+.letter{background:var(--card);border:2px solid var(--ink);border-left:10px solid var(--flame);border-radius:var(--r);padding:16px 18px;display:flex;flex-direction:column;gap:8px;box-shadow:5px 5px 0 var(--shadow)}
+.letter .msg{font-family:var(--display);font-weight:600;font-size:1.25rem;line-height:1.35;white-space:pre-wrap;overflow-wrap:anywhere}
+.newbox{background:linear-gradient(135deg,var(--pen-soft),var(--card));border:2px dashed var(--pen);border-radius:var(--r);padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.newbox ul{margin:0;padding-left:20px}
+.levelup{width:100%;background:linear-gradient(135deg,var(--pen),var(--flame));color:#fff;border-radius:var(--r);padding:18px 20px;display:flex;flex-direction:column;gap:4px;animation:pop .5s ease-out}
+.levelup .big{font-family:var(--display);font-weight:800;font-size:2rem;line-height:1.1}
+@keyframes pop{0%{transform:scale(.85);opacity:0}70%{transform:scale(1.03)}100%{transform:scale(1);opacity:1}}
+.sbook{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:14px}
+.sb{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.78rem;text-align:center;color:var(--muted);line-height:1.2}
+.stk{width:76px;height:76px;border-radius:20px;display:grid;place-items:center;font-size:2.6rem;background:var(--card);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--shadow);transform:rotate(var(--rot,0deg))}
+.stk.lock{border:2px dashed var(--lock);color:var(--lock);font-size:1.3rem;font-family:var(--display);font-weight:800;box-shadow:none;background:transparent}
+.sb.got{color:var(--ink)}
+.stk.fresh{animation:pop .6s ease-out}
+.themes{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.thm{text-align:left;border-radius:var(--r);border:2px solid var(--line);padding:0;overflow:hidden;background:var(--card);display:flex;flex-direction:column}
+.thm[aria-pressed="true"]{border:3px solid var(--ink);box-shadow:4px 4px 0 var(--shadow)}
+.thm .pv{height:70px;display:flex;align-items:flex-end;gap:6px;padding:10px}
+.thm .pv i{width:26px;height:26px;border-radius:50%;border:2px solid rgba(0,0,0,.25)}
+.thm span{padding:8px 12px;font-weight:700}
+.mixer{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.mixer label{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:.9rem}
+.mixer input[type=color]{width:100%;height:46px;border:2px solid var(--ink);border-radius:10px;padding:2px;background:var(--card)}
+.mixer input[type=text]{font:inherit;border:2px solid var(--ink);border-radius:10px;padding:9px 10px;background:var(--card);color:var(--ink)}
+.linkbox{font-family:ui-monospace,Menlo,monospace;font-size:.8rem;width:100%;border:2px solid var(--ink);border-radius:10px;padding:10px;background:var(--paper);color:var(--ink);word-break:break-all}
+textarea.msgin{font-family:var(--body);font-size:1.05rem;min-height:90px;word-break:normal}
+@media (max-width:520px){.quick{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.levelup,.stk.fresh{animation:none}}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;font-weight:700;z-index:9}
 </style>
 
@@ -713,7 +756,9 @@ function chapterWeeks(n) { const a = TW[(n - 1) * 5], b = TW[(n - 1) * 5 + 4]; c
 
 /* ---------- state ---------- */
 const KEY = 'talbane-roberta-v1';
-const blank = () => ({ v: 1, name: '', searches: [], created: today(), xp: 0, streak: { count: 0, last: null, shields: 0, best: 0 }, days: {}, skills: {}, badges: {}, totals: { n: 0, c: 0, first: 0, second: 0, hints: 0 }, bestCombo: 0, rounds: [], log: [], settings: { chapter: 'auto', len: 8 }, imported: null });
+const blank = () => ({ v: 1, name: '', searches: [], created: today(), xp: 0, streak: { count: 0, last: null, shields: 0, best: 0 }, days: {}, skills: {}, badges: {}, totals: { n: 0, c: 0, first: 0, second: 0, hints: 0 }, bestCombo: 0, rounds: [], log: [], settings: { chapter: 'auto', len: 8 }, imported: null,
+  /* v2 fields – all optional, old data gets these defaults */
+  wk: { goal: 3, met: {} }, look: { theme: 'papir', custom: { name: 'Mit tema', paper: '#fff4e8', pen: '#e8457a', flame: '#ffb400', pattern: 'dots' } }, stickers: {}, mastered: {}, letters: [], v2: null });
 let S = load();
 function load() { try { const r = localStorage.getItem(KEY); if (r) return Object.assign(blank(), JSON.parse(r)); } catch (e) {} return blank(); }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
@@ -744,7 +789,10 @@ const BADGES = [
   ['first', '1', 'Første runde'], ['s3', '3', '3 dage i træk'], ['s7', '7', 'En hel uge'], ['s14', '14', 'To uger i træk'], ['s30', '30', 'En måned i træk'],
   ['perfect', '★', 'Fejlfri runde'], ['nohint', '!', 'Ingen hints'], ['combo5', '×5', '5 i træk'], ['combo10', '×10', '10 i træk'], ['comeback', '↻', 'Giver ikke op'],
   ['c100', '100', '100 rigtige'], ['c500', '500', '500 rigtige'],
+  ['w1', 'U1', 'Første ugemål'], ['w4', 'U4', 'Ugemål 4 uger i træk'], ['w8', 'U8', 'Ugemål 8 uger i træk'], ['w12', 'U12', 'Ugemål 12 uger i træk'],
   ...CH.map(c => ['ch' + c.n, 'K' + c.n, 'Mester: ' + c.name])];
+const LEGACY = new Set(['s3', 's7', 's14', 's30']); // daily-streak badges: kept if earned, hidden otherwise
+const shownBadges = () => BADGES.filter(([id]) => !LEGACY.has(id) || S.badges[id]);
 function award(id, list) { if (!S.badges[id]) { S.badges[id] = today(); list.push(id); } }
 function checkBadges(list, round) {
   const st = S.streak.count;
@@ -755,6 +803,93 @@ function checkBadges(list, round) {
   if (S.totals.c >= 100) award('c100', list); if (S.totals.c >= 500) award('c500', list);
   if (round) { if (round.perfect) award('perfect', list); if (round.hints === 0 && round.items.length >= 6) award('nohint', list); }
   CH.forEach(c => { if (c.skills.every(s => stars(s.id) >= 2)) award('ch' + c.n, list); });
+  const ws = weekStreak();
+  if (ws >= 1) award('w1', list); if (ws >= 4) award('w4', list); if (ws >= 8) award('w8', list); if (ws >= 12) award('w12', list);
+}
+
+/* ---------- v2: weekly goal + weekly streak ---------- */
+const mondayOf = k => { const d = parse(k); return addDays(k, -((d.getDay() + 6) % 7)); };
+const weekCount = mk => { let n = 0; for (let i = 0; i < 7; i++) { const d = S.days[addDays(mk, i)]; if (d && d.r) n++; } return n; };
+const weekMet = mk => !!S.wk.met[mk] || weekCount(mk) >= S.wk.goal;
+function weekStreak() {
+  let mk = mondayOf(today()), n = 0;
+  if (weekMet(mk)) n++;
+  mk = addDays(mk, -7);
+  for (let i = 0; i < 520 && weekMet(mk); i++) { n++; mk = addDays(mk, -7); }
+  return n;
+}
+function setGoal(g) { // freeze past weeks with the old goal, so changing goal never rewrites history
+  const cur = mondayOf(today());
+  Object.keys(S.days).forEach(k => { const mk = mondayOf(k); if (mk < cur && !S.wk.met[mk] && weekCount(mk) >= S.wk.goal) S.wk.met[mk] = S.wk.goal; });
+  S.wk.goal = g;
+}
+
+/* ---------- v2: sticker book ---------- */
+const STICKERS = [['🦄', 'Enhjørning'], ['🐙', 'Blæksprutte'], ['🍩', 'Donut'], ['🌈', 'Regnbue'], ['🦊', 'Ræv'], ['🍓', 'Jordbær'], ['🐢', 'Skildpadde'], ['🪐', 'Planet'], ['🎧', 'Høretelefoner'], ['🌻', 'Solsikke'],
+  ['🐬', 'Delfin'], ['🍉', 'Vandmelon'], ['🦋', 'Sommerfugl'], ['🧁', 'Cupcake'], ['🐼', 'Panda'], ['⚡', 'Lyn'], ['🌙', 'Måne'], ['🍕', 'Pizza'], ['🐝', 'Bi'], ['🎨', 'Palet'],
+  ['🦩', 'Flamingo'], ['🍦', 'Is'], ['🐳', 'Hval'], ['🌵', 'Kaktus'], ['🎸', 'Guitar'], ['🦁', 'Løve'], ['🍒', 'Kirsebær'], ['🚀', 'Raket'], ['🐧', 'Pingvin'], ['🌸', 'Blomst'],
+  ['🤾', 'Håndbold'], ['🏆', 'Pokal'], ['🐸', 'Frø'], ['🍪', 'Småkage'], ['🦉', 'Ugle'], ['💎', 'Diamant'], ['🌊', 'Bølge'], ['🐞', 'Mariehøne'], ['🎀', 'Sløjfe'], ['🦕', 'Dino']];
+const stickerCount = () => Object.keys(S.stickers).length;
+function giveSticker(why) {
+  const free = STICKERS.map((_, i) => i).filter(i => !S.stickers[i]);
+  if (!free.length) return null;
+  const i = pick(free); S.stickers[i] = { d: today(), w: why }; return i;
+}
+const rot = i => ((i * 37) % 13) - 6; // fixed little tilt per sticker
+const stickerHTML = (i, fresh) => `<div class="sb got"><div class="stk ${fresh ? 'fresh' : ''}" style="--rot:${rot(i)}deg" aria-hidden="true">${STICKERS[i][0]}</div><span>${STICKERS[i][1]}</span></div>`;
+
+/* ---------- v2: themes ---------- */
+const THEMES = {
+  papir: { name: 'Matematikpapir', sw: ['#f6f8fc', '#2b55c8', '#ea6a22'] },
+  sommer: { name: 'Sommerfest', pattern: 'dots', v: { paper: '#fff4e6', grid: '#ffd9b0', card: '#ffffff', ink: '#2a1b3d', muted: '#6e5a80', line: '#f1cfae', pen: '#e8457a', 'pen-soft': '#ffe1ea', mark: 'rgba(255,196,0,.55)', flame: '#ff8a00', shadow: '#2a1b3d', lock: '#d6c3d3' } },
+  lagune: { name: 'Lagune', pattern: 'grid', v: { paper: '#e9fbf7', grid: '#c4ece4', card: '#ffffff', ink: '#103047', muted: '#4b6b7c', line: '#bfe3dc', pen: '#0e8c9b', 'pen-soft': '#d2f4f0', mark: 'rgba(255,214,64,.65)', flame: '#ff6b4a', shadow: '#103047', lock: '#a9cbc6' } },
+  slik: { name: 'Slikbutik', pattern: 'stripes', v: { paper: '#fbf0ff', grid: '#f3dcfa', card: '#ffffff', ink: '#33204a', muted: '#6f5a88', line: '#e8d2f2', pen: '#7f43f5', 'pen-soft': '#ece1ff', mark: 'rgba(96,232,190,.55)', flame: '#ff4f9a', shadow: '#33204a', lock: '#cdb9d9' } },
+  neon: { name: 'Neonnat', pattern: 'dots', dark: 1, v: { paper: '#14112b', grid: '#262054', card: '#1e1a42', ink: '#f5f2ff', muted: '#aaa3d8', line: '#3a3373', pen: '#ff4fd8', 'pen-soft': '#3a1f5e', mark: 'rgba(0,240,200,.32)', good: '#3ee8a0', 'good-soft': '#12382f', bad: '#ff6b8b', 'bad-soft': '#46182b', flame: '#ffb400', shadow: '#000000', lock: '#4c4585' } },
+  retro: { name: 'Retro', pattern: 'stripes', v: { paper: '#f6efe0', grid: '#eadcc0', card: '#fffaf0', ink: '#3b2a20', muted: '#7a6555', line: '#e0cfb2', pen: '#c0522d', 'pen-soft': '#f6dfd2', mark: 'rgba(230,180,60,.55)', flame: '#2f7f73', shadow: '#3b2a20', lock: '#cbb9a0' } },
+};
+const VARS = ['paper', 'grid', 'card', 'ink', 'muted', 'line', 'pen', 'pen-soft', 'mark', 'good', 'good-soft', 'bad', 'bad-soft', 'flame', 'shadow', 'lock', 'on-pen'];
+const hx = h => { h = String(h).replace('#', ''); if (h.length === 3) h = h.split('').map(c => c + c).join(''); const n = parseInt(h, 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+const toHex = a => '#' + a.map(v => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0')).join('');
+const mix = (a, b, t) => { const A = hx(a), B = hx(b); return toHex(A.map((v, i) => v + (B[i] - v) * t)); };
+const lum = h => { const [r, g, b] = hx(h).map(v => { v /= 255; return v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; }); return .2126 * r + .7152 * g + .0722 * b; };
+const okHex = h => /^#[0-9a-f]{6}$/i.test(String(h));
+function customVars(c) {
+  const paper = okHex(c.paper) ? c.paper : '#fff4e8', pen = okHex(c.pen) ? c.pen : '#e8457a', flame = okHex(c.flame) ? c.flame : '#ffb400';
+  const dark = lum(paper) < .2, ink = dark ? '#f4f2fb' : '#1d1830', card = dark ? mix(paper, '#ffffff', .08) : '#ffffff';
+  const [fr_, fg, fb] = hx(flame);
+  const v = { paper, card, ink, pen, flame, grid: mix(paper, pen, dark ? .22 : .16), line: mix(paper, ink, .2), muted: mix(ink, paper, .38), 'pen-soft': mix(card, pen, .18), mark: `rgba(${fr_},${fg},${fb},.45)`, shadow: dark ? '#000000' : ink, lock: mix(paper, ink, .3) };
+  if (dark) Object.assign(v, { good: '#52cf8f', 'good-soft': '#15392a', bad: '#ff8077', 'bad-soft': '#42211f' });
+  return { v, dark, pattern: c.pattern || 'dots' };
+}
+function applyLook(look) {
+  look = look || S.look; const root = document.documentElement;
+  VARS.forEach(k => root.style.removeProperty('--' + k)); root.removeAttribute('data-theme'); root.dataset.pattern = 'grid';
+  if (!look || look.theme === 'papir' || (!THEMES[look.theme] && look.theme !== 'mit')) return;
+  const t = look.theme === 'mit' ? customVars(look.custom || {}) : THEMES[look.theme];
+  Object.entries(t.v).forEach(([k, val]) => root.style.setProperty('--' + k, val));
+  root.style.setProperty('--on-pen', lum(t.v.pen) > .45 ? '#14121f' : '#ffffff');
+  root.setAttribute('data-theme', t.dark ? 'dark' : 'light'); root.dataset.pattern = t.pattern || 'grid';
+}
+const CHC = ['#ff6b6b', '#ffa94d', '#f5c400', '#51cf66', '#20c9a6', '#4dabf7', '#9775fa', '#f06595'];
+
+/* ---------- v2: message from dad (link with #far=…) ---------- */
+const b64u = s => btoa(String.fromCharCode(...new TextEncoder().encode(s))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const unb64u = s => { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return new TextDecoder().decode(unb64(s)); };
+const chk = s => { let h = 7; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return (h % 65536).toString(16).padStart(4, '0'); };
+const makeLetter = m => { const body = b64u(JSON.stringify({ m: m.slice(0, 200), t: new Date().toISOString() })); return 'FB1.' + body + '.' + chk(body); };
+function readLetter(code) {
+  const p = String(code).trim().split('.'); if (p.length !== 3 || p[0] !== 'FB1' || chk(p[1]) !== p[2]) return null;
+  try { const o = JSON.parse(unb64u(p[1])); return o && typeof o.m === 'string' && o.m.trim() ? { m: o.m.slice(0, 200), t: String(o.t || '') } : null; } catch (e) { return null; }
+}
+let viaLetter = false;
+function handleHash() {
+  const h = decodeURIComponent(location.hash || ''); if (!h.startsWith('#far=')) return false;
+  const L = readLetter(h.slice(5));
+  try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+  if (!L) { setTimeout(() => toast('Beskeden fra far kunne ikke læses'), 300); return false; }
+  S.letters = S.letters || [];
+  if (!S.letters.some(x => x.t === L.t && x.m === L.m)) { S.letters.unshift({ m: L.m, t: L.t, got: today(), read: false }); S.letters = S.letters.slice(0, 20); }
+  viaLetter = true; save(); return true;
 }
 
 /* ---------- round building ---------- */
@@ -773,7 +908,7 @@ function buildDaily() {
   for (let i = 0; i < L; i++) { const wantRev = rev.length && ri < rev.length && (i % 3 === 2 || ci >= curPick.length); order.push(wantRev ? { id: rev[ri++], rev: true } : { id: curPick[ci++] }); }
   return order;
 }
-function makeRound(mode, ids) { return { mode, items: ids.map(x => ({ id: x.id, rev: !!x.rev, q: SK[x.id].gen() })), i: 0, xp: 0, combo: 0, hints: 0, first: 0, correct: 0, extra: 0, start: Date.now(), res: [] }; }
+function makeRound(mode, ids) { return { mode, items: ids.map(x => ({ id: x.id, rev: !!x.rev, q: SK[x.id].gen() })), i: 0, xp: 0, combo: 0, hints: 0, first: 0, correct: 0, extra: 0, start: Date.now(), res: [], startXp: S.xp, newMastered: [] }; }
 
 /* ---------- answer checking ---------- */
 function parseNum(s) {
@@ -790,6 +925,7 @@ function recordSkill(id, result) { // result: 'first' | 'second' | 'wrong'
   const s = sk(id), t = today();
   s.n++; if (result !== 'wrong') s.c++; if (result === 'first') s.f++;
   if (result === 'first') s.box = Math.min(5, s.box + 1); else if (result === 'wrong') s.box = Math.max(0, s.box - 2);
+  if (s.box >= 3 && !S.mastered[id]) { S.mastered[id] = t; if (R0) (R0.newMastered = R0.newMastered || []).push(id); }
   s.due = addDays(t, INTERVAL[s.box]); s.last = t; s.h.push(result === 'first' ? 2 : result === 'second' ? 1 : 0); if (s.h.length > 8) s.h.shift();
   S.totals.n++; if (result !== 'wrong') S.totals.c++; if (result === 'first') S.totals.first++; if (result === 'second') S.totals.second++;
 }
@@ -805,12 +941,12 @@ function burst() { if (matchMedia('(prefers-reduced-motion: reduce)').matches) r
 let view = 'home', R0 = null, practiceCh = null, parentTab = 'overblik', resetArm = false;
 
 function header() {
-  const L = levelOf(S.xp), a = need(L), b = need(L + 1), pct = Math.round((S.xp - a) / (b - a) * 100), st = streakAlive();
+  const L = levelOf(S.xp), a = need(L), b = need(L + 1), pct = Math.round((S.xp - a) / (b - a) * 100), ws = weekStreak(), wc = weekCount(mondayOf(today()));
   return `<div class="top">
     <div class="lvl"><span class="eyebrow">Niveau ${L}</span><h1>Hej ${esc(S.name || '')}</h1>
       <div class="row" style="gap:8px"><b>${titleOf(L)}</b><span class="muted num">${S.xp - a} / ${b - a} XP til niveau ${L + 1}</span></div>
       <div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div></div>
-    <div class="streak">${FLAME(st > 0)}<div><b class="num">${st}</b><small>${st === 1 ? 'dag' : 'dage'} i træk</small>${S.streak.shields ? `<div class="shields" title="Skjolde redder din stribe, hvis du springer en dag over">${SHIELD.repeat(S.streak.shields)}</div>` : ''}</div></div>
+    <div class="streak" title="Uger i træk, hvor du har nået dit ugemål">${FLAME(ws > 0 || wc > 0)}<div><b class="num">${ws}</b><small>${ws === 1 ? 'uge' : 'uger'} i træk</small><span class="wk num">${wc}/${S.wk.goal} denne uge</span></div></div>
   </div>`;
 }
 
@@ -847,20 +983,27 @@ function homeView() {
   const L = S.settings.len, nRev = c > 1 ? Math.min(3, Math.round(L * .375)) : 0;
   const monday = (() => { const d = new Date(); const wd = (d.getDay() + 6) % 7; d.setDate(d.getDate() - wd); return dkey(d); })();
   const week = ['Ma', 'Ti', 'On', 'To', 'Fr', 'Lø', 'Sø'].map((n, i) => { const k = addDays(monday, i), on = S.days[k] && S.days[k].r; return `<div class="day ${on ? 'on' : ''} ${k === t ? 'today' : ''}"><i>${on ? '' : ''}</i><span>${n}</span></div>`; }).join('');
+  const wc = weekCount(mondayOf(t)), goal = S.wk.goal;
+  const weekLine = wc >= goal ? 'Ugemålet er nået. Alt ekstra i denne uge er bonus.' : `${wc} af ${goal} dage i denne uge.`;
   const roundCard = doneToday
-    ? `<div class="sticker round"><div class="done-msg"><div class="check"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><div><h2>Dagens runde er klaret</h2><p class="muted">Din stribe er sikret i dag. Vil du have flere XP, kan du tage en runde mere.</p></div></div>
-       <div class="row"><button class="btn primary" data-act="daily">Tag en ekstra runde</button><button class="btn" data-act="practice">Fri træning</button></div></div>`
-    : `<div class="sticker round"><span class="eyebrow">Dagens runde</span><h2>${L} opgaver · ca. ${Math.round(L * .8)} minutter</h2>
+    ? `<div class="sticker round"><div class="done-msg"><div class="check"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><div><h2>Dagens runde er klaret</h2><p class="muted">${weekLine} Har du lyst til mere, så vælg selv et emne.</p></div></div>
+       <div class="row"><button class="btn primary" data-act="practice">Vælg selv emne</button><button class="btn" data-act="daily">Tag en blandet runde</button></div></div>`
+    : `<div class="sticker round"><span class="eyebrow">Dagens runde</span><h2>${L} opgaver · ca. ${Math.round(L * .8)} min</h2>
        <div class="meta"><span class="tag cur">${L - nRev} × Kap. ${c} ${ch.name}</span>${nRev ? `<span class="tag">${nRev} × gentagelse fra tidligere kapitler</span>` : ''}</div>
-       <p class="muted">Klar dagens runde for at holde din stribe i live.</p>
-       <div class="row"><button class="btn primary" data-act="daily" id="startbtn">Start dagens runde</button></div></div>`;
-  const map = CH.map(x => { const avg = x.skills.reduce((a, s) => a + stars(s.id), 0) / x.skills.length, cls = x.n === c ? 'now' : x.n > c ? 'later' : ''; return `<button class="chap ${cls}" data-act="chap" data-ch="${x.n}"><span class="n">${x.n}</span><span class="t">${x.name}</span>${starRow(Math.floor(avg + 0.001))}<span class="s">${x.n === c ? 'Nu i klassen' : x.n < c ? 'Gennemgået' : 'Kommer ' + chapterWeeks(x.n).split(' – ')[0]}</span></button>`; }).join('');
-  const badges = BADGES.map(([id, g, nm]) => `<div class="badge ${S.badges[id] ? 'got' : ''}"><div class="medal">${g}</div><span>${nm}</span></div>`).join('');
-  return `${header()}${roundCard}${searchBox()}
-  <section><div class="row" style="justify-content:space-between"><h2>Ugen</h2><span class="muted">${Object.keys(S.badges).length} af ${BADGES.length} mærker</span></div><div class="week">${week}</div></section>
+       <p class="muted">${weekLine} Næste niveau: <b>${titleOf(levelOf(S.xp) + 1)}</b>.</p>
+       <div class="row"><button class="btn primary" data-act="daily" id="startbtn">Start dagens runde</button><button class="btn ghost" data-act="practice">Vælg selv emne</button></div></div>`;
+  const unread = (S.letters || []).find(x => !x.read);
+  const letter = unread ? `<div class="letter" role="status"><span class="eyebrow">Besked fra far${unread.t ? ' · ' + esc(new Date(unread.t).toLocaleDateString('da-DK', { day: 'numeric', month: 'long' })) : ''}</span><p class="msg">${esc(unread.m)}</p><div class="row"><button class="btn small primary" data-act="readletter">Tak, far!</button></div></div>` : '';
+  const newbox = !S.v2 ? `<div class="newbox"><h2>Nyt i Talbanen</h2><ul><li>Vælg dit eget tema – eller design dit helt eget.</li><li>Saml klistermærker i din bog, når du stiger i niveau, når du får styr på et emne, og når du når dit ugemål.</li><li>Ugemål: du bestemmer selv, hvor mange dage om ugen. Flammen tæller uger i træk.</li><li>Far kan sende dig beskeder, som står her på forsiden.</li></ul><div class="row"><button class="btn primary small" data-act="theme">Vælg mit tema</button><button class="btn small" data-act="v2ok">Fedt, luk</button></div></div>` : '';
+  const quick = `<div class="quick"><button class="qbtn" data-act="theme"><span class="ic" aria-hidden="true">🎨</span><span><b>Mit tema</b><small>${esc(S.look.theme === 'mit' ? (S.look.custom.name || 'Mit tema') : (THEMES[S.look.theme] || THEMES.papir).name)}</small></span></button><button class="qbtn" data-act="stickers"><span class="ic" aria-hidden="true">📒</span><span><b>Klistermærker</b><small>${stickerCount()} af ${STICKERS.length} i bogen</small></span></button></div>`;
+  const goalBtns = `<div class="wkgoal"><span class="muted">Dit ugemål:</span>${[2, 3, 4, 5].map(g => `<button data-act="goal" data-g="${g}" aria-pressed="${goal === g}">${g}</button>`).join('')}<span class="muted">dage</span></div>`;
+  const map = CH.map(x => { const avg = x.skills.reduce((a, s) => a + stars(s.id), 0) / x.skills.length, cls = x.n === c ? 'now' : x.n > c ? 'later' : ''; return `<button class="chap ${cls}" style="--cc:${CHC[x.n - 1]}" data-act="chap" data-ch="${x.n}"><span class="n">${x.n}</span><span class="t">${x.name}</span>${starRow(Math.floor(avg + 0.001))}<span class="s">${x.n === c ? 'Nu i klassen' : x.n < c ? 'Gennemgået' : 'Kommer ' + chapterWeeks(x.n).split(' – ')[0]}</span></button>`; }).join('');
+  const SB = shownBadges(), badges = SB.map(([id, g, nm]) => `<div class="badge ${S.badges[id] ? 'got' : ''}"><div class="medal">${g}</div><span>${nm}</span></div>`).join('');
+  return `${header()}${letter}${newbox}${roundCard}${quick}${searchBox()}
+  <section><div class="row" style="justify-content:space-between"><h2>Ugen</h2><span class="muted">${SB.filter(([id]) => S.badges[id]).length} af ${SB.length} mærker</span></div><div class="week">${week}</div>${goalBtns}</section>
   <section><h2>Årets bane</h2><p class="muted">Kontext+ 6 – kapitlerne i den rækkefølge, I har dem i klassen. Tryk på et kapitel for at træne det.</p><div class="map">${map}</div></section>
   <section><h2>Mærker</h2><div class="badges">${badges}</div></section>
-  <div class="foot"><div class="row"><button class="btn" data-act="practice">Fri træning</button><button class="btn" data-act="send">Send status til far</button></div><button class="btn ghost small" data-act="parent">Til far ›</button></div>`;
+  <div class="foot"><div class="row"><button class="btn" data-act="practice">Fri træning</button><button class="btn" data-act="send">Send din runde til far</button></div><button class="btn ghost small" data-act="parent">Til far ›</button></div>`;
 }
 
 function practiceView() {
@@ -888,21 +1031,23 @@ function quizView() {
   else if (it.hint) fb = `<div class="hintbox">${q.hint}</div>`;
   const title = r.mode === 'daily' ? 'Dagens runde' : 'Træning';
   return `<div class="qtop"><button class="btn ghost small" data-act="quit" aria-label="Afbryd runden">✕</button><div class="prog" aria-label="Opgave ${r.i + 1} af ${r.items.length}">${prog}</div><span class="combo">${r.combo >= 2 ? '×' + r.combo : ''}</span></div>
-  <div class="sticker qcard"><span class="eyebrow">${title} · Kap. ${s.ch} ${ch.name} · ${s.name}${it.rev ? ' · gentagelse' : ''}</span>
+  <div class="sticker qcard" style="--cc:${CHC[s.ch - 1]}"><span class="eyebrow">${title} · Kap. ${s.ch} ${ch.name} · ${s.name}${it.rev ? ' · gentagelse' : ''}</span>
     <div class="qtext">${q.text}</div>${q.visual || ''}${ans}${fb}
-    <div class="qactions">${it.final ? '<span></span>' : `<button class="btn ghost small" data-act="hint" ${it.hint || it.tries ? 'disabled' : ''}>Vis hint (giver 5 XP i stedet for 10)</button>`}${it.final ? `<button class="btn primary" data-act="next" id="nextbtn">${r.i + 1 < r.items.length ? 'Næste' : 'Se resultat'} →</button>` : ''}</div>
+    <div class="qactions">${it.final ? '<span></span>' : `<button class="btn ghost small" data-act="hint" ${it.hint || it.tries ? 'disabled' : ''}>Vis hint</button>`}${it.final ? `<button class="btn primary" data-act="next" id="nextbtn">${r.i + 1 < r.items.length ? 'Næste' : 'Se resultat'} →</button>` : ''}</div>
   </div><p class="muted" style="font-size:.85rem">Tip: Tryk Enter for at tjekke eller gå videre. Tast 1–4 for at vælge et svar.</p>`;
 }
 
 const PRAISE = ['Sådan!', 'Flot regnet!', 'Præcis!', 'Skarpt!', 'Rigtigt!', 'Godt tænkt!', 'Klaret!'];
+const PRAISE_RETRY = ['Du prøvede igen og fik den!', 'Andet forsøg sad – godt kæmpet!', 'Du gav ikke op. Sådan!'];
+const PRAISE_HINT = ['Hintet hjalp, og du klarede resten selv.', 'Godt brugt hint – og rigtigt svar!', 'Du fandt vejen med hintet. Flot.'];
 function submit(val) {
   const r = R0, it = r.items[r.i], q = it.q;
   if (it.final) return;
   if (q.type === 'num') { it.val = val; if (isNaN(parseNum(val))) { toast('Skriv et tal – brug komma til decimaler'); return; } }
   if (isRight(q, val)) {
     const res = it.tries || it.hint ? 'second' : 'first';
-    let gain = res === 'first' ? 10 : 5; r.combo++; S.bestCombo = Math.max(S.bestCombo, r.combo); if (r.combo >= 3) gain += 5;
-    it.res = res; it.gain = gain; it.final = true; it.praise = r.combo >= 3 ? `${r.combo} i træk!` : pick(PRAISE);
+    let gain = it.tries ? 5 : 10; r.combo++; S.bestCombo = Math.max(S.bestCombo, r.combo); if (r.combo >= 3) gain += 5; // a hint alone no longer costs XP
+    it.res = res; it.gain = gain; it.final = true; it.praise = it.tries ? pick(PRAISE_RETRY) : it.hint ? pick(PRAISE_HINT) : r.combo >= 3 ? `${r.combo} i træk!` : pick(PRAISE);
     r.xp += gain; S.xp += gain; r.correct++; if (res === 'first') r.first++;
     recordSkill(it.id, res);
   } else if (!it.tries) {
@@ -926,23 +1071,41 @@ function finishRound() {
     bonus = 20 + (r.perfect ? 20 : 0);
   } else { const d = S.days[t] || (S.days[t] = { r: 0, q: 0, c: 0, ms: 0 }); d.q += n; d.c += r.correct; d.ms += ms; bonus = r.perfect ? 10 : 0; }
   S.xp += bonus; r.xp += bonus;
-  S.rounds.unshift({ d: t, m: r.mode, n, c: r.correct, f: r.first, xp: r.xp, ms, h: r.hints, ch: curChapter() }); S.rounds = S.rounds.slice(0, 120);
+  S.rounds.unshift({ d: t, m: r.mode, n, c: r.correct, f: r.first, xp: r.xp, ms, h: r.hints, ch: curChapter(), l: viaLetter ? 1 : 0 }); S.rounds = S.rounds.slice(0, 120);
+  if (r.mode === 'daily') viaLetter = false;
+  // weekly goal: reached for the first time this week?
+  const mk = mondayOf(t);
+  if (r.mode === 'daily' && newStreak && !S.wk.met[mk] && weekCount(mk) >= S.wk.goal) { S.wk.met[mk] = S.wk.goal; r.weekGoal = true; }
   const nb = []; checkBadges(nb, r); r.newBadges = nb; r.usedShield = usedShield; r.newStreak = newStreak; r.ms = ms;
+  // level up + stickers (earned, never bought)
+  const L0 = levelOf(r.startXp), L1 = levelOf(S.xp); r.levelUp = L1 > L0 ? L1 : 0;
+  r.newStickers = []; const give = why => { const i = giveSticker(why); if (i !== null) r.newStickers.push(i); };
+  if (r.levelUp) give('Nyt niveau ' + L1);
+  if (r.weekGoal) give('Ugemål nået');
+  (r.newMastered || []).slice(0, 2).forEach(id => give('Styr på ' + SK[id].name.toLowerCase()));
+  nb.filter(id => id.startsWith('ch')).forEach(id => give('Kapitelmester'));
   const weak = {}; r.items.forEach(x => { if (x.res !== 'first') weak[x.id] = 1; }); r.weak = Object.keys(weak);
-  save(); view = 'done'; render(); if (r.first >= n * .75 || nb.length) burst();
+  save(); view = 'done'; render(); if (r.first >= n * .75 || nb.length || r.levelUp || r.newStickers.length) burst();
 }
 
 function doneView() {
   const r = R0, n = r.items.length, L = levelOf(S.xp);
   const msg = r.perfect ? 'Fejlfri runde. Det er stærkt.' : r.first >= n * .75 ? 'Rigtig flot runde.' : r.correct >= n * .5 ? 'Godt kæmpet – du gav ikke op.' : 'Det var svære opgaver i dag. Det er sådan, man lærer.';
   const nb = r.newBadges.map(id => { const b = BADGES.find(x => x[0] === id); return `<div class="badge got"><div class="medal">${b[1]}</div><span>${b[2]}</span></div>`; }).join('');
+  const mk = mondayOf(today()), wc = weekCount(mk), goal = S.wk.goal, ws = weekStreak();
+  const a = need(L), b = need(L + 1), toNext = b - S.xp;
+  const mastered = (r.newMastered || []).map(id => SK[id].name.toLowerCase());
+  const nowCan = mastered.length ? `Nyt: du har styr på <b>${mastered.join('</b> og <b>')}</b>.` : '';
+  const next = `Næste niveau er <b>${titleOf(L + 1)}</b> – ${toNext} XP herfra.`;
   return `<div class="sticker result"><span class="eyebrow">${r.mode === 'daily' ? 'Dagens runde klaret' : 'Træning klaret'}</span>
-    <div class="bignum num">${r.correct} <span style="font-size:1.4rem" class="muted">af ${n} rigtige</span></div><p>${msg}</p>
-    <div class="stats"><div class="stat"><b>+${r.xp}</b><span>XP · niveau ${L}</span></div><div class="stat"><b>${streakAlive()}</b><span>${r.newStreak ? 'dage i træk (+1)' : 'dage i træk'}</span></div><div class="stat"><b>${Math.max(1, Math.round(r.ms / 60000))} min</b><span>tid brugt</span></div></div>
-    ${r.usedShield ? `<p class="hintbox">Et skjold reddede din stribe, fordi du sprang ${r.usedShield === 1 ? 'en dag' : r.usedShield + ' dage'} over.</p>` : ''}
+    ${r.levelUp ? `<div class="levelup" role="status"><span class="eyebrow" style="color:#fff">Nyt niveau</span><span class="big">Niveau ${r.levelUp}: ${titleOf(r.levelUp)}</span><span>Du er steget i niveau. Det har du selv regnet dig til.</span></div>` : ''}
+    <div class="bignum num">${r.correct} <span style="font-size:1.4rem" class="muted">af ${n} rigtige</span></div><p>${msg}${nowCan ? ' ' + nowCan : ''}</p>
+    <div class="stats"><div class="stat"><b>+${r.xp}</b><span>XP · niveau ${L}</span></div><div class="stat"><b>${wc}/${goal}</b><span>${r.weekGoal ? 'ugemålet er nået!' : wc >= goal ? 'ugemål nået – alt ekstra er bonus' : 'dage i denne uge'}</span></div><div class="stat"><b>${ws}</b><span>${ws === 1 ? 'uge' : 'uger'} i træk med ugemål</span></div></div>
+    ${r.newStickers && r.newStickers.length ? `<div><h3 style="margin-bottom:10px">${r.newStickers.length === 1 ? 'Nyt klistermærke' : 'Nye klistermærker'} til din bog</h3><div class="newbadges">${r.newStickers.map(i => stickerHTML(i, true)).join('')}</div></div>` : ''}
     ${nb ? `<div><h3 style="margin-bottom:10px">Nye mærker</h3><div class="newbadges">${nb}</div></div>` : ''}
+    <p class="hintbox">${next}</p>
     ${r.weak.length ? `<div><h3>Øv mere på</h3><p class="muted">${r.weak.map(id => SK[id].name).join(' · ')}</p></div>` : ''}
-    <div class="row"><button class="btn primary" data-act="home" id="homebtn">Til forsiden</button>${r.weak.length ? `<button class="btn" data-act="drill" data-sk="${r.weak[0]}">Øv ${SK[r.weak[0]].name.toLowerCase()}</button>` : ''}</div></div>`;
+    <div class="row"><button class="btn primary" data-act="home" id="homebtn">Til forsiden</button><button class="btn" data-act="practice">Vælg selv emne</button>${r.newStickers && r.newStickers.length ? '<button class="btn ghost" data-act="stickers">Se din bog</button>' : ''}</div></div>`;
 }
 
 /* ---------- export / import ---------- */
@@ -962,9 +1125,38 @@ async function decode(code) {
 
 function sendView() {
   return `<div class="row"><button class="btn ghost small" data-act="home">‹ Tilbage</button></div>
-  <section><h1>Send status til far</h1><p>Koden herunder indeholder dine fremskridt: stribe, XP, mærker, og hvilke emner du er god til og skal øve. Kopiér den, og send den til far i en besked. Så kan han se, hvordan det går.</p>
+  <section><h1>Send din runde til far</h1><p>Kopiér koden herunder og send den til far i en besked. Så kan han se dine runder, mærker og klistermærker – og skrive tilbage til dig. Hans svar kommer som et link, og beskeden står på din forside, når du åbner det.</p>
   <textarea id="code" readonly aria-label="Din statuskode">Laver koden …</textarea>
   <div class="row"><button class="btn primary" data-act="copy">Kopiér kode</button><span class="muted" style="font-size:.9rem">Koden er også en backup. Mister du dine data, kan far gendanne dem med den.</span></div></section>`;
+}
+
+/* ---------- v2 views: themes + sticker book ---------- */
+let draft = null; // custom theme being edited
+function themeView() {
+  const cur = S.look.theme;
+  const cards = Object.entries(THEMES).map(([id, t]) => { const sw = t.sw || [t.v.paper, t.v.pen, t.v.flame]; return `<button class="thm" data-act="pickth" data-th="${id}" aria-pressed="${cur === id}"><div class="pv" style="background:${sw[0]}">${sw.map(c => `<i style="background:${c}"></i>`).join('')}</div><span>${t.name}</span></button>`; }).join('');
+  const c = draft || S.look.custom;
+  const mine = `<button class="thm" data-act="pickth" data-th="mit" aria-pressed="${cur === 'mit'}"><div class="pv" style="background:${esc(c.paper)}"><i style="background:${esc(c.paper)}"></i><i style="background:${esc(c.pen)}"></i><i style="background:${esc(c.flame)}"></i></div><span>${esc(c.name || 'Mit tema')}</span></button>`;
+  return `<div class="row" style="justify-content:space-between"><button class="btn ghost small" data-act="home">‹ Tilbage</button></div>
+  <section><span class="eyebrow">Mit tema</span><h1>Hvordan skal Talbanen se ud?</h1><p class="muted">Tryk på et tema for at prøve det. Det gemmes med det samme.</p><div class="themes">${cards}${mine}</div></section>
+  <section class="panel"><h2>Design dit eget tema</h2><p class="muted">Vælg farver og mønster. Du ser det med det samme.</p>
+    <div class="mixer">
+      <label>Navn<input type="text" id="th-name" maxlength="20" value="${esc(c.name || 'Mit tema')}"></label>
+      <label>Baggrund<input type="color" id="th-paper" value="${esc(c.paper)}"></label>
+      <label>Hovedfarve<input type="color" id="th-pen" value="${esc(c.pen)}"></label>
+      <label>Accentfarve<input type="color" id="th-flame" value="${esc(c.flame)}"></label>
+      <label>Mønster<select id="th-pattern">${[['dots', 'Prikker'], ['grid', 'Tern'], ['stripes', 'Striber'], ['none', 'Ingen']].map(([v, n]) => `<option value="${v}" ${c.pattern === v ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+    </div>
+    <div class="row"><button class="btn primary" data-act="savetheme">Gem mit tema</button><span class="muted" style="font-size:.9rem">Mørk baggrund giver automatisk lys tekst.</span></div></section>`;
+}
+function readMixer() { const g = id => document.getElementById(id); return { name: (g('th-name').value || 'Mit tema').slice(0, 20), paper: g('th-paper').value, pen: g('th-pen').value, flame: g('th-flame').value, pattern: g('th-pattern').value }; }
+function stickerView() {
+  const n = stickerCount();
+  const all = STICKERS.map((s, i) => S.stickers[i] ? `<div title="${esc(S.stickers[i].w || '')}">${stickerHTML(i)}</div>` : `<div class="sb"><div class="stk lock" style="--rot:${rot(i)}deg">?</div><span>&nbsp;</span></div>`).join('');
+  return `<div class="row" style="justify-content:space-between"><button class="btn ghost small" data-act="home">‹ Tilbage</button></div>
+  <section><span class="eyebrow">Din klistermærkebog</span><h1>${n} af ${STICKERS.length} klistermærker</h1>
+  <p class="muted">Du får et nyt klistermærke, når du stiger i niveau, når du får styr på et emne (2 stjerner), når du når dit ugemål, og når du bliver kapitelmester. Hold musen over et klistermærke for at se, hvordan du fik det.</p>
+  <div class="sbook">${all}</div></section>`;
 }
 
 /* ---------- parent ---------- */
@@ -981,7 +1173,8 @@ function parentView() {
   const start = addDays(t, -27), wd = (parse(start).getDay() + 6) % 7, calStart = addDays(start, -wd);
   const span = daysBetween(calStart, t) + 1;
   const cal = Array.from({ length: span }, (_, i) => { const k = addDays(calStart, i), d = S.days[k]; return `<i class="${d && d.r ? 'on' : d && d.q ? 'part' : ''} ${k === t ? 'today' : ''}" title="${k}${d ? ` · ${d.c}/${d.q} rigtige` : ''}"></i>`; }).join('');
-  const tabs = ['overblik', 'emner', 'fejl', 'sog', 'indstillinger'].map(x => `<button data-act="ptab" data-tab="${x}" aria-pressed="${parentTab === x}">${{ overblik: 'Overblik', emner: 'Emner', fejl: 'Seneste fejl', sog: 'Søgninger', indstillinger: 'Indstillinger' }[x]}</button>`).join('');
+  const tabs = ['overblik', 'besked', 'emner', 'fejl', 'sog', 'indstillinger'].map(x => `<button data-act="ptab" data-tab="${x}" aria-pressed="${parentTab === x}">${{ overblik: 'Overblik', besked: 'Skriv til hende', emner: 'Emner', fejl: 'Seneste fejl', sog: 'Søgninger', indstillinger: 'Indstillinger' }[x]}</button>`).join('');
+  const nm = S.name ? esc(S.name) : 'hende';
   const banner = S.imported ? `<div class="banner">Du ser ${esc(S.name || 'hendes')}s data fra en kode, sendt ${new Date(S.imported).toLocaleString('da-DK', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}.</div>` : '';
   let body = '';
   if (parentTab === 'overblik') {
@@ -990,12 +1183,22 @@ function parentView() {
     let weak = practiced.filter(id => S.skills[id].n >= 2).sort((a, b) => (S.skills[a].f / S.skills[a].n - S.skills[b].f / S.skills[b].n) || (S.skills[a].box - S.skills[b].box)).filter(id => !strong.includes(id)).slice(0, 2);
     if (weak.length < 2) weak = weak.concat(CH[c - 1].skills.map(s => s.id).filter(id => !weak.includes(id) && !strong.includes(id) && stars(id) < 2).slice(0, 2 - weak.length));
     const talk = `<div class="talk">
-      <div class="item"><h3>Start med det, der går godt</h3><p>${S.streak.count >= 2 ? `Hun har en stribe på ${streakAlive()} dage. ` : ''}${strong.length ? `Hun er sikrest i <b>${strong.map(id => SK[id].name.toLowerCase()).join('</b> og <b>')}</b>.` : 'Når hun har taget et par runder, kan du se her, hvad hun er stærkest i.'}</p></div>
+      <div class="item"><h3>Start med det, der går godt</h3><p>${weekStreak() >= 1 ? `Hun har nået sit ugemål ${weekStreak()} ${weekStreak() === 1 ? 'uge' : 'uger'} i træk. ` : ''}${strong.length ? `Hun er sikrest i <b>${strong.map(id => SK[id].name.toLowerCase()).join('</b> og <b>')}</b>.` : 'Når hun har taget et par runder, kan du se her, hvad hun er stærkest i.'}</p></div>
       <div class="item warn"><h3>Løs en opgave sammen</h3><p class="muted">Lad hende forklare, hvordan hun tænker, før I ser svaret.</p>${weak.map(id => `<div class="together" data-sk="${id}"><span class="eyebrow">${SK[id].name} · Kap. ${SK[id].ch}</span><div class="slot"></div><div class="row"><button class="btn small" data-act="tq" data-sk="${id}">Ny opgave</button><button class="btn small ghost" data-act="ta">Vis svar</button></div><div class="sol" hidden></div></div>`).join('')}</div>
       <div class="item"><h3>Spørg hende</h3><p>Hvad laver I i matematik lige nu? Hvad var det sværeste i denne uge? Hvilken opgave i dag var du mest stolt af?</p></div></div>`;
-    body = `<div class="kv"><div class="stat"><b>${roundsWeek}/7</b><span>dage med runde, sidste uge</span></div><div class="stat"><b>${q7 ? Math.round(f7 / q7 * 100) : '–'}${q7 ? ' %' : ''}</b><span>rigtige i første forsøg</span></div><div class="stat"><b>${avgMin || '–'}${avgMin ? ' min' : ''}</b><span>pr. runde i snit</span></div><div class="stat"><b>${levelOf(S.xp)}</b><span>niveau · ${S.xp} XP</span></div></div>
-      <section><h2>Sidste 4 uger</h2><div class="cal" aria-label="Kalender over dage med runde">${cal}</div><p class="muted" style="font-size:.85rem">Orange: dagens runde klaret. Gul: kun fri træning. Ma–Sø fra venstre.</p></section>
+    const r28 = S.rounds.filter(r => r.m === 'daily' && daysBetween(r.d, t) < 28), viaL = r28.filter(r => r.l).length;
+    body = `<div class="kv"><div class="stat"><b>${weekCount(mondayOf(t))}/${S.wk.goal}</b><span>dage denne uge (ugemål) · ${weekStreak()} ${weekStreak() === 1 ? 'uge' : 'uger'} i træk</span></div><div class="stat"><b>${q7 ? Math.round(f7 / q7 * 100) : '–'}${q7 ? ' %' : ''}</b><span>rigtige i første forsøg</span></div><div class="stat"><b>${avgMin || '–'}${avgMin ? ' min' : ''}</b><span>pr. runde i snit</span></div><div class="stat"><b>${levelOf(S.xp)}</b><span>niveau · ${S.xp} XP</span></div></div>
+      <section><h2>Sidste 4 uger</h2><div class="cal" aria-label="Kalender over dage med runde">${cal}</div><p class="muted" style="font-size:.85rem">Orange: dagens runde klaret. Gul: kun fri træning. Ma–Sø fra venstre. ${roundsWeek} dage med runde de sidste 7 dage.</p>
+        <p class="muted" style="font-size:.85rem">Sidste 4 uger: ${r28.length} runder, heraf ${viaL} startet lige efter en besked fra dig. Resten åbnede hun selv. ${stickerCount()} klistermærker i bogen.</p></section>
       <section><h2>Til jeres snak</h2>${talk}</section>`;
+  } else if (parentTab === 'besked') {
+    const isFile = location.protocol === 'file:';
+    body = `<section class="panel"><h2>Skriv til ${nm}</h2><p class="muted">Skriv en kort besked (højst 200 tegn). Du får et link, som du sender til hende i Beskeder. Når hun åbner linket, står beskeden på hendes forside. Ros det, hun har gjort – fx hvordan hun regnede – og spørg gerne til en opgave.</p>
+      <textarea id="msgin" class="msgin" maxlength="200" placeholder="Fx: Sej procent-runde! Hvordan tog du nr. 4?"></textarea>
+      <div class="row"><button class="btn primary" data-act="mklink">Lav link</button><span class="muted" style="font-size:.85rem" id="msgcount">0/200</span></div>
+      <div id="linkout" hidden><p class="muted" style="font-size:.9rem">Send dette link til ${nm}:</p><textarea id="linkbox" class="linkbox" readonly rows="3"></textarea><div class="row"><button class="btn small" data-act="copylink">Kopiér link</button></div></div>
+      ${isFile ? '<p class="banner">Du har åbnet Talbanen som en fil. Linket virker kun, hvis du åbner Talbanen fra GitHub-adressen og laver linket derfra.</p>' : ''}</section>
+      <section><p class="muted" style="font-size:.9rem">Tip: Én kort besked efter hver runde, hun sender, er nok. Undgå beskeder om dage, hun ikke har øvet.</p></section>`;
   } else if (parentTab === 'emner') {
     body = CH.map(ch => `<section><div><span class="eyebrow">Kap. ${ch.n} · ${chapterWeeks(ch.n)}${ch.n === c ? ' · nu' : ''}</span><h2>${ch.name}</h2><p class="goal">Fælles Mål: ${ch.goal}</p></div><div class="tbl-wrap"><table><thead><tr><th>Emne</th><th>Status</th><th>Første forsøg</th><th>Sidst øvet</th></tr></thead><tbody>${ch.skills.map(s => { const st = S.skills[s.id], [cls, lab] = statusOf(s.id); return `<tr><td>${s.name}<br>${starRow(stars(s.id))}</td><td><span class="pill ${cls}">${lab}</span></td><td class="n">${st && st.n ? `${st.f}/${st.n}` : '–'}</td><td class="n">${st && st.last ? parse(st.last).toLocaleDateString('da-DK', { day: 'numeric', month: 'short' }) : '–'}</td></tr>`; }).join('')}</tbody></table></div></section>`).join('');
   } else if (parentTab === 'sog') {
@@ -1028,6 +1231,8 @@ function render() {
   else if (view === 'done') app.innerHTML = doneView();
   else if (view === 'send') { app.innerHTML = sendView(); encode().then(c => { const t = document.getElementById('code'); if (t) t.value = c; }); }
   else if (view === 'parent') { app.innerHTML = parentView(); app.querySelectorAll('.together').forEach(fillTogether); }
+  else if (view === 'theme') app.innerHTML = themeView();
+  else if (view === 'stickers') app.innerHTML = stickerView();
   if (document.getElementById('searchres') && lastQ) showSearch(lastQ);
   if (view === 'quiz') { const it = R0.items[R0.i]; if (it.final) document.getElementById('nextbtn')?.focus(); else document.getElementById('numin')?.focus(); }
 }
@@ -1039,7 +1244,11 @@ app.addEventListener('change', e => {
   if (e.target.id === 'chsel') { S.settings.chapter = e.target.value; save(); toast('Kapitel gemt'); render(); }
   if (e.target.id === 'lensel') { S.settings.len = Number(e.target.value); save(); toast('Længde gemt'); }
 });
-app.addEventListener('input', e => { if (e.target.id === 'searchin') showSearch(e.target.value); });
+app.addEventListener('input', e => {
+  if (e.target.id === 'searchin') showSearch(e.target.value);
+  if (e.target.id && e.target.id.startsWith('th-')) { draft = readMixer(); applyLook({ theme: 'mit', custom: draft }); }
+  if (e.target.id === 'msgin') { const c = document.getElementById('msgcount'); if (c) c.textContent = e.target.value.length + '/200'; }
+});
 app.addEventListener('click', async e => {
   const b = e.target.closest('[data-act]'); if (!b) return; const a = b.dataset.act;
   if (a === 'home') go('home');
@@ -1062,9 +1271,18 @@ app.addEventListener('click', async e => {
   else if (a === 'ptab') { parentTab = b.dataset.tab; resetArm = false; render(); }
   else if (a === 'tq') fillTogether(b.closest('.together'));
   else if (a === 'ta') { const s = b.closest('.together').querySelector('.sol'); s.hidden = !s.hidden; }
-  else if (a === 'import') { const v = document.getElementById('incode').value.trim(); if (!v) { toast('Indsæt en kode først'); return; } try { const o = await decode(v); if (!o || o.v !== 1) throw 0; S = Object.assign(blank(), o, { imported: o.exportedAt || new Date().toISOString() }); save(); parentTab = 'overblik'; toast('Koden er indlæst'); render(); } catch (err) { toast('Koden kunne ikke læses. Tjek at hele koden er kopieret med.'); } }
-  else if (a === 'reset') { if (!resetArm) { resetArm = true; render(); } else { S = blank(); save(); resetArm = false; toast('Alt er nulstillet'); go('home'); } }
+  else if (a === 'import') { const v = document.getElementById('incode').value.trim(); if (!v) { toast('Indsæt en kode først'); return; } try { const o = await decode(v); if (!o || o.v !== 1) throw 0; S = Object.assign(blank(), o, { imported: o.exportedAt || new Date().toISOString() }); fixup(); applyLook(); save(); parentTab = 'overblik'; toast('Koden er indlæst'); render(); } catch (err) { toast('Koden kunne ikke læses. Tjek at hele koden er kopieret med.'); } }
+  else if (a === 'reset') { if (!resetArm) { resetArm = true; render(); } else { S = blank(); save(); applyLook(); resetArm = false; toast('Alt er nulstillet'); go('home'); } }
   else if (a === 'unreset') { resetArm = false; render(); }
+  else if (a === 'goal') { setGoal(Number(b.dataset.g)); save(); toast(`Ugemål: ${b.dataset.g} dage`); render(); }
+  else if (a === 'readletter') { const L = (S.letters || []).find(x => !x.read); if (L) { L.read = today(); save(); } render(); }
+  else if (a === 'v2ok') { S.v2 = today(); save(); render(); }
+  else if (a === 'theme') { if (!S.v2) { S.v2 = today(); save(); } draft = null; go('theme'); }
+  else if (a === 'stickers') go('stickers');
+  else if (a === 'pickth') { const th = b.dataset.th; S.look = { theme: th, custom: draft || S.look.custom }; draft = null; save(); applyLook(); render(); toast('Tema gemt'); }
+  else if (a === 'savetheme') { S.look = { theme: 'mit', custom: readMixer() }; draft = null; save(); applyLook(); render(); toast('Dit tema er gemt'); }
+  else if (a === 'mklink') { const m = (document.getElementById('msgin').value || '').trim(); if (!m) { toast('Skriv en besked først'); return; } const link = location.href.split('#')[0] + '#far=' + makeLetter(m); const box = document.getElementById('linkbox'); box.value = link; document.getElementById('linkout').hidden = false; box.focus(); box.select(); }
+  else if (a === 'copylink') { const t = document.getElementById('linkbox'); try { await navigator.clipboard.writeText(t.value); toast('Linket er kopieret'); } catch (err) { t.focus(); t.select(); toast('Markeret – tryk ⌘C for at kopiere'); } }
 });
 document.addEventListener('keydown', e => {
   if (view !== 'quiz' || !R0) return; const it = R0.items[R0.i];
@@ -1072,8 +1290,25 @@ document.addEventListener('keydown', e => {
   if (!it.final && it.q.type === 'mc' && /^[1-4]$/.test(e.key)) { const i = Number(e.key) - 1, c = it.q.choices[i]; if (c !== undefined && !(it.tried || []).includes(c)) submit(c); }
 });
 
+/* ---------- v2 start-up: repair partial fields, one-time upgrade, theme, letter link ---------- */
+function fixup() {
+  const d = blank();
+  if (!S.wk || typeof S.wk !== 'object') S.wk = d.wk; if (!S.wk.met) S.wk.met = {}; if (![2, 3, 4, 5].includes(S.wk.goal)) S.wk.goal = 3;
+  if (!S.look || typeof S.look !== 'object') S.look = d.look; if (!S.look.custom) S.look.custom = d.look.custom;
+  ['stickers', 'mastered'].forEach(k => { if (!S[k] || typeof S[k] !== 'object') S[k] = {}; });
+  if (!Array.isArray(S.letters)) S.letters = [];
+  if (!S.v2mig) { // one-time upgrade from version 1: honour skills she already masters + a welcome sticker
+    Object.keys(S.skills).forEach(id => { if (SK[id] && S.skills[id].box >= 3 && !S.mastered[id]) { S.mastered[id] = S.skills[id].last || today(); if (stickerCount() < 4) giveSticker('Styr på ' + SK[id].name.toLowerCase()); } });
+    giveSticker('Velkommen til den nye Talbane');
+    S.v2mig = today();
+  }
+}
+fixup(); save();
+applyLook();
+handleHash();
+window.addEventListener('hashchange', () => { if (handleHash()) { view = 'home'; render(); } });
 render();
-window.__talbane = { CH, SK, parseNum, isRight, searchSkills };
+window.__talbane = { CH, SK, parseNum, isRight, searchSkills, makeLetter, readLetter, weekStreak, levelOf };
 })();
 </script>
 
