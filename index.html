@@ -208,6 +208,13 @@ select{font:inherit;border:2px solid var(--ink);border-radius:10px;padding:8px 1
 .goal{font-size:.85rem;color:var(--muted);font-style:italic}
 .kv{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 @media (max-width:560px){.kv{grid-template-columns:repeat(2,minmax(0,1fr))}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.search .inwrap{max-width:none}
+.search .inwrap input{font-family:var(--body);font-weight:400;font-size:1.1rem}
+.qchips{display:flex;flex-wrap:wrap;gap:8px}
+button.tag{cursor:pointer;min-height:34px}
+button.tag:hover{border-color:var(--pen);color:var(--pen)}
+.sres{display:flex;flex-direction:column;gap:10px}
+.sres .panel{padding:14px 16px}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;font-weight:700;z-index:9}
 </style>
 
@@ -609,6 +616,84 @@ const CH = [
 ];
 const SK = {}; CH.forEach(c => c.skills.forEach(s => { s.ch = c.n; SK[s.id] = s; }));
 
+/* ---------- topic search: words she might type for each skill ---------- */
+const KW = {
+ '1a': 'decimaltal decimal decimaler komma kommatal titalssystem positionssystem tiendedele hundrededele tusindedele ciffer cifre gange med 10 dividere med 10 dele med 100',
+ '1b': 'decimaltal decimal komma sammenligne sammenligning størst mindst ordne rækkefølge',
+ '1c': 'brøk brøker brøkregning forkorte forkortning udvide tæller nævner brøk til decimaltal omregne',
+ '1d': 'brøk brøker brøkregning plus lægge sammen addition addere brøkdel del af tæller nævner',
+ '1e': 'negative tal negativ minus minustal minusgrader temperatur tallinje',
+ '1f': 'potens potenser kvadrat kvadrattal kvadratrod kvadratrødder rod rødder anden potens opløftet eksponent',
+ '2a': 'geometri cirkel cirkler radius diameter centrum',
+ '2b': 'geometri cirkel cirkler omkreds pi π',
+ '2c': 'geometri cirkel cirkler areal pi π',
+ '2d': 'cirkel cirkler pi π formel formler',
+ '2e': 'cirkel vinkel vinkler grader cirkeldiagram lagkagediagram cirkeludsnit',
+ '3a': 'procent procenter procentregning procentdel hvor mange procent',
+ '3b': 'procent procentregning rabat udsalg nedsat tilbud prisstigning stigning ny pris penge handel',
+ '3c': 'procent procentregning decimaltal brøk brøker omregne omregning',
+ '3d': 'bedste køb billigst enhedspris pris pr stk penge handel division',
+ '3e': 'overslag saldo budget penge handel klassekasse hovedregning regnestrategi regnestrategier gange',
+ '4a': 'geometri vinkel vinkler vinkeltyper spids stump ret vinkel grader',
+ '4b': 'geometri vinkel vinkler vinkelsum trekant trekanter firkant firkanter grader',
+ '4c': 'geometri trekant trekanter firkant firkanter figurer kvadrat rektangel rombe parallelogram trapez polygon polygoner ligebenet ligesidet retvinklet mangekant',
+ '4d': 'geometri areal arealer rektangel trekant parallelogram grundlinje højde figurer',
+ '4e': 'geometri omkreds rektangel polygon polygoner figurer',
+ '4f': 'geometri vinkel vinkler vinkelsum polygon polygoner mangekant regulær',
+ '5a': 'gennemsnit middeltal middelværdi statistik data',
+ '5b': 'median statistik data midterste',
+ '5c': 'typetal variationsbredde statistik data',
+ '5d': 'frekvens hyppighed statistik data procent',
+ '5e': 'sandsynlighed sandsynligheder chance chancer terning terninger tilfældig',
+ '5f': 'fart hastighed km/t tid strækning',
+ '6a': 'algebra bogstaver bogstavregning variabel variable udtryk x indsætte',
+ '6b': 'ligning ligninger løse algebra x ukendt',
+ '6c': 'formel formler algebra bogstaver',
+ '6d': 'mønster mønstre figurtal talfølge talrække algebra',
+ '6e': 'primtal prim divisor delelig',
+ '6f': 'regnehierarki regnearternes hierarki parentes parenteser regneregler gange før plus rækkefølge',
+ '7a': 'rumfang volumen kasse kasser kubik cm3 cm³ rum',
+ '7b': 'liter rumfang deciliter dl ml cl enheder omregne omregning',
+ '7c': 'overflade overfladeareal areal kasse terning rum',
+ '7d': 'geometri rumlige figurer terning pyramide prisme flader kanter hjørner polyeder polyedre 3d fodbold rum',
+ '7e': 'målestok tegning tegninger skala forhold',
+ '8a': 'geometri symmetri symmetriakse symmetriakser spejl spejling figurer',
+ '8b': 'geometri spejling spejle spejl koordinater koordinatsystem',
+ '8c': 'geometri parallelforskydning forskydning flytning flytninger koordinater koordinatsystem',
+ '8d': 'geometri drejning drejninger rotation dreje drejningssymmetri',
+ '8e': 'geometri mønster mønstre gentagelse gentagelser',
+};
+const normQ = s => String(s).toLowerCase().replace(/[.,!?;:()"'»«]/g, ' ').replace(/\s+/g, ' ').trim();
+const STOP = new Set(['og', 'i', 'med', 'at', 'af', 'en', 'et', 'til', 'om', 'på', 'jeg', 'vil', 'øve', 'gerne', 'hvordan', 'man', 'den', 'det', 'de', 'er', 'for', 'mig', 'noget', 'lidt', 'mere', 'træne', 'regne', 'opgaver', 'opgave', 'matematik', 'hvad', 'kan']);
+function lev(a, b) { const m = a.length, n = b.length, d = Array.from({ length: m + 1 }, (_, i) => [i]); for (let j = 1; j <= n; j++) d[0][j] = j; for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); return d[m][n]; }
+function searchSkills(q) {
+  const words = normQ(q).split(' ').filter(w => w && !STOP.has(w));
+  if (!words.length) return [];
+  const qn = words.join(' '), res = [], cc = curChapter();
+  for (const id in SK) {
+    const s = SK[id], hay = normQ(KW[id] + ' ' + s.name + ' ' + CH[s.ch - 1].name), toks = hay.split(' ');
+    let sc = qn.length >= 4 && hay.includes(qn) ? 2 : 0;
+    for (const w of words) {
+      let best = 0;
+      for (const t of toks) {
+        let v = 0;
+        if (t === w) v = 3;
+        else if (w.length >= 3 && t.length >= 3 && (t.startsWith(w) || w.startsWith(t))) v = 2.5;
+        else if (w.length >= 5 && t.length >= 5 && (t.includes(w) || w.includes(t))) v = 2;
+        else if (w.length >= 4 && Math.abs(t.length - w.length) <= 2 && lev(w, t) <= (w.length >= 7 ? 2 : 1)) v = 1.5;
+        if (v > best) best = v;
+      }
+      sc += best;
+    }
+    const nameToks = normQ(s.name).split(' ');
+    if (sc >= 1.5 && words.some(w => w.length >= 3 && nameToks.some(t => t.length >= 3 && (t.startsWith(w) || w.startsWith(t))))) sc += 1;
+    if (sc >= 1.5) res.push({ id, sc: sc + (s.ch === cc ? .2 : 0) });
+  }
+  res.sort((a, b) => b.sc - a.sc);
+  const top = res.length ? res[0].sc : 0;
+  return res.filter(r => r.sc >= top * .6).slice(0, 8).map(r => r.id);
+}
+
 /* ---------- calendar: Kontext+ 6, 5 teaching weeks per chapter ---------- */
 const HOLIDAY_MONDAYS = ['2026-10-12', '2026-12-21', '2026-12-28', '2027-02-15', '2027-03-22'];
 const dkey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -628,7 +713,7 @@ function chapterWeeks(n) { const a = TW[(n - 1) * 5], b = TW[(n - 1) * 5 + 4]; c
 
 /* ---------- state ---------- */
 const KEY = 'talbane-roberta-v1';
-const blank = () => ({ v: 1, name: '', created: today(), xp: 0, streak: { count: 0, last: null, shields: 0, best: 0 }, days: {}, skills: {}, badges: {}, totals: { n: 0, c: 0, first: 0, second: 0, hints: 0 }, bestCombo: 0, rounds: [], log: [], settings: { chapter: 'auto', len: 8 }, imported: null });
+const blank = () => ({ v: 1, name: '', searches: [], created: today(), xp: 0, streak: { count: 0, last: null, shields: 0, best: 0 }, days: {}, skills: {}, badges: {}, totals: { n: 0, c: 0, first: 0, second: 0, hints: 0 }, bestCombo: 0, rounds: [], log: [], settings: { chapter: 'auto', len: 8 }, imported: null });
 let S = load();
 function load() { try { const r = localStorage.getItem(KEY); if (r) return Object.assign(blank(), JSON.parse(r)); } catch (e) {} return blank(); }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
@@ -732,6 +817,30 @@ function header() {
 function nameView() {
   return `<section class="sticker round"><span class="eyebrow">Velkommen til Talbanen</span><h1>Hvad hedder du?</h1><p class="muted">Din matematikbane til Kontext+ 6. Skriv dit fornavn, så er du klar.</p><form id="nameform" class="ans" autocomplete="off"><label class="inwrap"><input id="namein" maxlength="24" aria-label="Dit fornavn"></label><button class="btn primary" type="submit">Start</button></form></section>`;
 }
+let lastQ = '';
+const QCHIPS = ['brøker', 'procent', 'areal', 'ligninger', 'vinkler', 'sandsynlighed'];
+function searchBox() {
+  return `<section class="panel search"><h2>Hvad vil du øve?</h2><p class="muted">Skriv et emne, du arbejder med i timerne – fx brøker eller procentregning.</p>
+  <form id="searchform" class="row" role="search" autocomplete="off"><label class="inwrap"><input id="searchin" placeholder="Skriv et emne …" aria-label="Søg efter et emne" value="${esc(lastQ)}"></label><button class="btn primary" type="submit">Find opgaver</button></form>
+  <div class="qchips">${QCHIPS.map(t => `<button class="tag" data-act="sq" data-q="${t}">${t}</button>`).join('')}</div>
+  <div id="searchres" class="sres"></div></section>`;
+}
+function searchResults(q) {
+  q = q.trim(); if (q.length < 2) return '';
+  const ids = searchSkills(q);
+  if (!ids.length) return `<div class="hintbox"><b>Jeg kunne ikke finde opgaver om »${esc(q)}«.</b> Prøv et andet ord, eller vælg et kapitel herunder. Mangler emnet i Talbanen, så skriv det ned som en idé til far – så kan vi bygge det ind.</div>
+    <div class="qchips">${CH.map(c => `<button class="tag" data-act="chap" data-ch="${c.n}">Kap. ${c.n} ${c.name}</button>`).join('')}</div>`;
+  const cc = curChapter();
+  const rows = ids.map(id => { const s = SK[id], st = S.skills[id]; return `<div class="panel row" style="justify-content:space-between"><div style="min-width:0"><span class="eyebrow">Kap. ${s.ch} · ${CH[s.ch - 1].name}${s.ch > cc ? ' · kommer senere i klassen' : s.ch === cc ? ' · nu i klassen' : ''}</span><h3>${s.name}</h3><div class="row" style="gap:8px">${starRow(stars(id))}<span class="muted" style="font-size:.85rem">${st && st.n ? `${st.c} af ${st.n} rigtige` : 'Ikke prøvet endnu'}</span></div></div><button class="btn small" data-act="sdrill" data-sk="${id}">Øv 5</button></div>`; }).join('');
+  return `<div class="row" style="justify-content:space-between"><p><b>${ids.length} ${ids.length === 1 ? 'opgavetype' : 'opgavetyper'}</b> om »${esc(q)}«</p>${ids.length > 1 ? `<button class="btn primary small" data-act="smix" data-ids="${ids.join(',')}">Øv dem alle · 8 opgaver</button>` : ''}</div>${rows}`;
+}
+function showSearch(q) { lastQ = q; const box = document.getElementById('searchres'); if (box) box.innerHTML = searchResults(q); }
+function logSearch(q) {
+  q = q.trim(); if (q.length < 2) return; const n = searchSkills(q).length;
+  S.searches = S.searches || []; const top = S.searches[0];
+  if (top && top.q.toLowerCase() === q.toLowerCase() && top.d === today()) return;
+  S.searches.unshift({ d: today(), q: q.slice(0, 60), n }); S.searches = S.searches.slice(0, 40); save();
+}
 function homeView() {
   if (!S.name) return nameView();
   const t = today(), c = curChapter(), ch = CH[c - 1], doneToday = !!(S.days[t] && S.days[t].r);
@@ -747,7 +856,7 @@ function homeView() {
        <div class="row"><button class="btn primary" data-act="daily" id="startbtn">Start dagens runde</button></div></div>`;
   const map = CH.map(x => { const avg = x.skills.reduce((a, s) => a + stars(s.id), 0) / x.skills.length, cls = x.n === c ? 'now' : x.n > c ? 'later' : ''; return `<button class="chap ${cls}" data-act="chap" data-ch="${x.n}"><span class="n">${x.n}</span><span class="t">${x.name}</span>${starRow(Math.floor(avg + 0.001))}<span class="s">${x.n === c ? 'Nu i klassen' : x.n < c ? 'Gennemgået' : 'Kommer ' + chapterWeeks(x.n).split(' – ')[0]}</span></button>`; }).join('');
   const badges = BADGES.map(([id, g, nm]) => `<div class="badge ${S.badges[id] ? 'got' : ''}"><div class="medal">${g}</div><span>${nm}</span></div>`).join('');
-  return `${header()}${roundCard}
+  return `${header()}${roundCard}${searchBox()}
   <section><div class="row" style="justify-content:space-between"><h2>Ugen</h2><span class="muted">${Object.keys(S.badges).length} af ${BADGES.length} mærker</span></div><div class="week">${week}</div></section>
   <section><h2>Årets bane</h2><p class="muted">Kontext+ 6 – kapitlerne i den rækkefølge, I har dem i klassen. Tryk på et kapitel for at træne det.</p><div class="map">${map}</div></section>
   <section><h2>Mærker</h2><div class="badges">${badges}</div></section>
@@ -759,6 +868,7 @@ function practiceView() {
   const tabs = CH.map(x => `<button data-act="pch" data-ch="${x.n}" aria-pressed="${x.n === c}">${x.n}</button>`).join('');
   const rows = ch.skills.map(s => { const st = S.skills[s.id]; return `<div class="panel row" style="justify-content:space-between"><div style="min-width:0"><h3>${s.name}</h3><div class="row" style="gap:8px">${starRow(stars(s.id))}<span class="muted" style="font-size:.85rem">${st && st.n ? `${st.c} af ${st.n} rigtige` : 'Ikke prøvet endnu'}</span></div></div><button class="btn small" data-act="drill" data-sk="${s.id}">Øv 5</button></div>`; }).join('');
   return `<div class="row" style="justify-content:space-between"><button class="btn ghost small" data-act="home">‹ Tilbage</button><span class="muted">Fri træning giver XP, men tæller ikke som dagens runde</span></div>
+  ${searchBox()}
   <section><span class="eyebrow">Kapitel ${c} · ${ch.area}</span><h1>${ch.name}</h1><div class="tabs" role="group" aria-label="Vælg kapitel">${tabs}</div>
   <p class="muted">Læs mere i bogen: Viden om, s. ${ch.viden}</p>
   <button class="btn primary" data-act="mixch" data-ch="${c}" style="align-self:flex-start">Bland hele kapitlet · 8 opgaver</button>${rows}</section>`;
@@ -871,7 +981,7 @@ function parentView() {
   const start = addDays(t, -27), wd = (parse(start).getDay() + 6) % 7, calStart = addDays(start, -wd);
   const span = daysBetween(calStart, t) + 1;
   const cal = Array.from({ length: span }, (_, i) => { const k = addDays(calStart, i), d = S.days[k]; return `<i class="${d && d.r ? 'on' : d && d.q ? 'part' : ''} ${k === t ? 'today' : ''}" title="${k}${d ? ` · ${d.c}/${d.q} rigtige` : ''}"></i>`; }).join('');
-  const tabs = ['overblik', 'emner', 'fejl', 'indstillinger'].map(x => `<button data-act="ptab" data-tab="${x}" aria-pressed="${parentTab === x}">${{ overblik: 'Overblik', emner: 'Emner', fejl: 'Seneste fejl', indstillinger: 'Indstillinger' }[x]}</button>`).join('');
+  const tabs = ['overblik', 'emner', 'fejl', 'sog', 'indstillinger'].map(x => `<button data-act="ptab" data-tab="${x}" aria-pressed="${parentTab === x}">${{ overblik: 'Overblik', emner: 'Emner', fejl: 'Seneste fejl', sog: 'Søgninger', indstillinger: 'Indstillinger' }[x]}</button>`).join('');
   const banner = S.imported ? `<div class="banner">Du ser ${esc(S.name || 'hendes')}s data fra en kode, sendt ${new Date(S.imported).toLocaleString('da-DK', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}.</div>` : '';
   let body = '';
   if (parentTab === 'overblik') {
@@ -888,6 +998,9 @@ function parentView() {
       <section><h2>Til jeres snak</h2>${talk}</section>`;
   } else if (parentTab === 'emner') {
     body = CH.map(ch => `<section><div><span class="eyebrow">Kap. ${ch.n} · ${chapterWeeks(ch.n)}${ch.n === c ? ' · nu' : ''}</span><h2>${ch.name}</h2><p class="goal">Fælles Mål: ${ch.goal}</p></div><div class="tbl-wrap"><table><thead><tr><th>Emne</th><th>Status</th><th>Første forsøg</th><th>Sidst øvet</th></tr></thead><tbody>${ch.skills.map(s => { const st = S.skills[s.id], [cls, lab] = statusOf(s.id); return `<tr><td>${s.name}<br>${starRow(stars(s.id))}</td><td><span class="pill ${cls}">${lab}</span></td><td class="n">${st && st.n ? `${st.f}/${st.n}` : '–'}</td><td class="n">${st && st.last ? parse(st.last).toLocaleDateString('da-DK', { day: 'numeric', month: 'short' }) : '–'}</td></tr>`; }).join('')}</tbody></table></div></section>`).join('');
+  } else if (parentTab === 'sog') {
+    const ss = S.searches || [];
+    body = ss.length ? `<section><h2>Det har hun søgt efter</h2><p class="muted">Søgninger uden resultat er emner, Talbanen ikke dækker endnu – gode kandidater til næste version.</p><div class="tbl-wrap"><table><thead><tr><th>Dato</th><th>Søgning</th><th>Resultat</th></tr></thead><tbody>${ss.map(x => `<tr><td class="n">${parse(x.d).toLocaleDateString('da-DK', { day: 'numeric', month: 'short' })}</td><td>${esc(x.q)}</td><td>${x.n ? `<span class="pill ok">${x.n} opgavetyper</span>` : '<span class="pill bad">Fandt intet</span>'}</td></tr>`).join('')}</tbody></table></div></section>` : '<p class="muted">Ingen søgninger endnu. Når hun søger efter et emne, kommer det med her.</p>';
   } else if (parentTab === 'fejl') {
     body = S.log.length ? `<section><h2>Opgaver hun ikke fik rigtige</h2><p class="muted">De seneste ${S.log.length}. Gode at tage op sammen – spørg, hvordan hun regnede.</p><div class="log">${S.log.map(l => `<div><span class="eyebrow">${parse(l.d).toLocaleDateString('da-DK', { day: 'numeric', month: 'short' })} · ${SK[l.sk] ? SK[l.sk].name : ''}</span><p>${esc(l.q)}</p><p>Hendes svar: <b>${esc(l.a)}</b> · Rigtigt svar: <b>${esc(l.r)}</b></p></div>`).join('')}</div></section>` : '<p class="muted">Ingen fejl endnu. Når hun svarer forkert to gange på en opgave, kommer den med her.</p>';
   } else {
@@ -915,16 +1028,18 @@ function render() {
   else if (view === 'done') app.innerHTML = doneView();
   else if (view === 'send') { app.innerHTML = sendView(); encode().then(c => { const t = document.getElementById('code'); if (t) t.value = c; }); }
   else if (view === 'parent') { app.innerHTML = parentView(); app.querySelectorAll('.together').forEach(fillTogether); }
+  if (document.getElementById('searchres') && lastQ) showSearch(lastQ);
   if (view === 'quiz') { const it = R0.items[R0.i]; if (it.final) document.getElementById('nextbtn')?.focus(); else document.getElementById('numin')?.focus(); }
 }
 function go(v) { view = v; resetArm = false; render(); window.scrollTo(0, 0); }
 function startRound(mode, ids) { R0 = makeRound(mode, ids); go('quiz'); }
 
-app.addEventListener('submit', e => { if (e.target.id === 'nameform') { e.preventDefault(); const v = document.getElementById('namein').value.trim(); if (v) { S.name = v.slice(0, 24); save(); render(); } return; } if (e.target.id === 'numform') { e.preventDefault(); submit(document.getElementById('numin').value); } });
+app.addEventListener('submit', e => { if (e.target.id === 'searchform') { e.preventDefault(); const v = document.getElementById('searchin').value; showSearch(v); logSearch(v); return; } if (e.target.id === 'nameform') { e.preventDefault(); const v = document.getElementById('namein').value.trim(); if (v) { S.name = v.slice(0, 24); save(); render(); } return; } if (e.target.id === 'numform') { e.preventDefault(); submit(document.getElementById('numin').value); } });
 app.addEventListener('change', e => {
   if (e.target.id === 'chsel') { S.settings.chapter = e.target.value; save(); toast('Kapitel gemt'); render(); }
   if (e.target.id === 'lensel') { S.settings.len = Number(e.target.value); save(); toast('Længde gemt'); }
 });
+app.addEventListener('input', e => { if (e.target.id === 'searchin') showSearch(e.target.value); });
 app.addEventListener('click', async e => {
   const b = e.target.closest('[data-act]'); if (!b) return; const a = b.dataset.act;
   if (a === 'home') go('home');
@@ -932,6 +1047,9 @@ app.addEventListener('click', async e => {
   else if (a === 'practice') { practiceCh = null; go('practice'); }
   else if (a === 'chap') { practiceCh = Number(b.dataset.ch); go('practice'); }
   else if (a === 'pch') { practiceCh = Number(b.dataset.ch); render(); }
+  else if (a === 'sq') { const inp = document.getElementById('searchin'); if (inp) inp.value = b.dataset.q; showSearch(b.dataset.q); logSearch(b.dataset.q); }
+  else if (a === 'sdrill') { logSearch(lastQ); startRound('practice', Array(5).fill(0).map(() => ({ id: b.dataset.sk }))); }
+  else if (a === 'smix') { logSearch(lastQ); const ids = b.dataset.ids.split(','); const seq = []; while (seq.length < 8) seq.push(...shuf(ids)); startRound('practice', seq.slice(0, 8).map(id => ({ id }))); }
   else if (a === 'drill') startRound('practice', Array(5).fill(0).map(() => ({ id: b.dataset.sk })));
   else if (a === 'mixch') { const ids = CH[Number(b.dataset.ch) - 1].skills.map(s => s.id); startRound('practice', shuf(ids.concat(ids)).slice(0, 8).map(id => ({ id }))); }
   else if (a === 'mc') submit(R0.items[R0.i].q.choices[Number(b.dataset.i)]);
@@ -955,7 +1073,8 @@ document.addEventListener('keydown', e => {
 });
 
 render();
-window.__talbane = { CH, SK, parseNum, isRight };
+window.__talbane = { CH, SK, parseNum, isRight, searchSkills };
 })();
 </script>
+
 </body></html>
